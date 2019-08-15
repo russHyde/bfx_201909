@@ -9,6 +9,10 @@ How to structure the presentation?
 - Focus on:
 
     - models we use everyday (and might misunderstand)
+    
+        - can we reimplement limma / edgeR from first principles
+        
+        - can we extend limma / edgeR using stan|jags / lme4 / Manova
 
     - novel / nonstandard techniques that lie under the hood of tools we use
     everyday
