@@ -1,35 +1,82 @@
 ---
-title: "Statistics & Bioinformatics"
+title: "Stats & Bioinformatics"
 author: "Russ Hyde"
 date: "14 August 2019"
-output: ioslides_presentation
+output:
+    ioslides_presentation
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-## R Markdown
+# A Tale of Many Models
 
-This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## The Dataset
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+<!--
+  TODO:
+  - download some external dataset that has multiple nested levels
+  - eg, GSE103528: three treatments, three cell lines, duplicates for each cell
+  line
+  - Convert it to a count matrix for use in edgeR, limma etc
+-->
 
-## Slide with Bullets
+## The Simplest Model
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
+<!--
+  - How should the dependent variable be modelled
+  - How should the explanatory / independent variables be incorporated
+  - What should be estimated
+  - What should be controlled
+  - How should the covariates be controlled
+  - How should uncertainties in mapping, biases in library composition etc etc
+  be incorporated
+-->
 
-## Slide with R Output
+<!--
+  Illustrate with a single gene from the example dataset
+-->
 
-```{r cars, echo = TRUE}
-summary(cars)
+<!--
+  There is _no_ one simplest model
+-->
+
+## Some Univariate Distibutions
+
+```{r, echo = FALSE}
+# source: wikipedia
+url <- "./figures/Relationships_among_some_of_univariate_probability_distributions.jpg"
 ```
 
-## Slide with Plot
+![](`r url`){ width=100% }
 
-```{r pressure}
-plot(pressure)
-```
+Source: Ehsan Azhdari [CC BY-SA 3.0] via Wikipedia
 
+## The 'transform to normality' approach: `lm()`
+
+## The 'borrow information' approach: `limma`
+
+## The 'count all the things' approach: `edgeR` / `DESeq2`
+
+## The Statistical Philosophies
+
+## The 'batch-effects are random variables' approach (`lme4`)
+
+<!-- Voom with duplicate correlation -->
+
+<!-- variancePartition::dream() -->
+
+## The 'everything is a random variable' approach (`stan` / `jags`)
+
+## The 'beyond the scope of the talk, and of my explanatory powers' approaches ...
+
+- genes aren't independent of each other ...
+
+    - epigenomic context
+
+    - coregulatory modules
+
+- dynamic modelling of gene expression ...
+
+- the cell population milkshake ...
