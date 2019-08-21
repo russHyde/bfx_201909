@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 # A Tale of Many Models
 
+
 ## The Dataset
 
 <!--
@@ -22,7 +23,72 @@ knitr::opts_chunk$set(echo = FALSE)
   - Convert it to a count matrix for use in edgeR, limma etc
 -->
 
-## The Simplest Model
+
+## The Simplest Model (in shorthand)
+
+$$\mathbf{y} \sim \mathcal{N} \left(X\boldsymbol{\beta}, \sigma^2I \right)$$
+
+Where,
+
+$\mathbf{y}$ - observed values
+
+$\mathtt{lhs} \sim \mathcal{N}(., .)$ - normality assumption (_on_ the
+residuals; or _around_ the fitted values)
+
+$X$ - _a_ design matrix (one row per observation)
+
+$\boldsymbol{\beta}, \sigma$ - parameters to be estimated (vector and scalar,
+resp)
+
+... plus lots of assumptions
+
+
+## The Simplest Model (in practice)
+
+$$\mathbf{y} \sim \mathcal{N} \left(X\boldsymbol{\beta}, \sigma^2I \right)$$
+
+Where,
+
+$\mathbf{y}$ - eg, log-expression-intensity for a single gene across a set of
+samples
+
+$\mathtt{lhs} \sim \mathcal{N}(., .)$ - some statistical distribution
+
+$X$ - some encoding of experimental design / predictors for the samples
+
+$\boldsymbol{\beta}$ - how much does each predictor contribute ...
+
+$\sigma$ - and how much noise is there around ...
+
+... the fitted values
+
+<!-- TODO: Generalisation:
+    - Multiple 'y'
+      - repeated measures
+      - different genes
+    - _N_ -> ARBITRARY_DIST(params)
+    - Fixed effects -> Mixed effects: modification of X
+-->
+
+<!--
+
+## The Simplest Model (Assumptions)
+
+Residuals:
+
+- IID normal
+
+- mean 0 for all values of predictor variables
+
+Model:
+
+- The model is correct ...
+
+- Predictors are fixed and have no errors
+
+- Single source of unaccounted noise
+
+-->
 
 <!--
   - How should the dependent variable be modelled
