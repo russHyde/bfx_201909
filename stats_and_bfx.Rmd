@@ -10,7 +10,7 @@ output:
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-# A Tale of Many Models
+# A Link To The Past:  Statistical connections within the bioinformatics toolkit
 
 
 ## The Dataset
