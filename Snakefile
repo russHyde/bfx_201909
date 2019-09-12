@@ -6,14 +6,14 @@
 # - Therefore, we wrote a script to download the files using bash
 
 local_rsem = "data/ext/GSE103528_RSEM.gene.results.txt.gz"
+ensembled_rsem = "data/ext/GSE103528_RSEM.gene.results.ensembl.tsv"
 local_gtf = "data/ext/Homo_sapiens.GRCh38.87.gtf.gz"
 gene_details = "data/ext/Homo_sapiens.GRCh38.87.gene_details.tsv"
 
 rule all:
     input:
         gene_details,
-        local_rsem,
-        local_gtf
+        ensembled_rsem
 
 rule get_gse103528:
     message:
@@ -27,6 +27,27 @@ rule get_gse103528:
     shell:
         """
             bash ./scripts/data_download.sh
+        """
+
+rule reformat_gse103528:
+    message:
+        """
+        --- Replace `ENSG00001234_<gene_symbol>` with `ENSG00001234` in the
+            RSEM file
+        """
+
+    input:
+        "data/ext/{prefix}.txt.gz"
+
+    output:
+        "data/ext/{prefix}.ensembl.tsv"
+
+    shell:
+        """
+            cat {input} |\
+            gunzip - |\
+            perl -npe "s/(ENSG[0-9]{{11}})_(.*?)\\t/\$1\\t/" - \
+            > {output}
         """
 
 rule get_gtf:
