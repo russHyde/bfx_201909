@@ -4,4 +4,8 @@
 .Ruserdata
 
 *.html
+
+.snakemake/
+
 stats_and_bfx_files/
+data/
