@@ -15,6 +15,21 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## The Dataset
 
+GSE103528
+
+- Sources of variability:
+
+    - 3x AML cell lines (Acute myeloid leukaemia)
+    - 3x treatments ("Scramble", and two shRNAs vs _CARM1_ (aka _PRMT4_))
+    - Triplicates (not obvious: are replicates batches?)
+
+- Data:
+
+    - Star / RSEM / GRCh38 / Ensembl-87
+    - (@russHyde should have aligned the data and used actual counts
+        - but life's too short
+        - he just `floor`ed the RSEM values)
+
 <!--
   TODO:
   - download some external dataset that has multiple nested levels
@@ -22,7 +37,6 @@ knitr::opts_chunk$set(echo = FALSE)
   line
   - Convert it to a count matrix for use in edgeR, limma etc
 -->
-
 
 ## The Simplest Model (in shorthand)
 
