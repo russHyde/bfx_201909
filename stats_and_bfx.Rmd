@@ -58,13 +58,23 @@ for (pkg in pkgs) {
         - but life's too short
         - he just `floor`ed the RSEM values)
 
-<!--
-  TODO:
-  - download some external dataset that has multiple nested levels
-  - eg, GSE103528: three treatments, three cell lines, duplicates for each cell
-  line
-  - Convert it to a count matrix for use in edgeR, limma etc
--->
+---
+
+## The Dataset (cont.)
+
+```{r, echo = TRUE, message = FALSE}
+dge <- readRDS(file.path("data", "job", "GSE103528.dgelist.rds"))
+dge <- dge[dge$genes$gene_biotype == "protein_coding", ]
+dim(dge)
+```
+
+```{r, echo = TRUE, fig.height = half_height, fig.align = "center"}
+dge %>%
+  edgeR::cpm(log = TRUE) %>%
+  limma::plotDensities(legend = FALSE, main = "Density of log-CPM")
+```
+
+---
 
 ## The Simplest Model (in shorthand)
 
