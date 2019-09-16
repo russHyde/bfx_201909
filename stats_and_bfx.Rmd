@@ -9,7 +9,46 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
-half_height = 4
+height.5 = 6
+height.75 = 9
+set.seed(3)
+```
+
+```{r}
+design_heatmap <- function(
+  ...,
+  row_title = "Samples",
+  column_title = "Coefficients"
+) {
+  ComplexHeatmap::Heatmap(...,
+    col = c("0" = "grey87", "1" = "black"),
+    cluster_rows = FALSE,
+    cluster_columns = FALSE,
+    row_title = row_title,
+    column_title = column_title
+  )
+}
+```
+
+```{r}
+factor_model <- function(
+  object, ...
+) {
+  stopifnot(is(object, "formula"))
+
+  mm <- stats::model.matrix(object, ...)
+
+  # prefixing the factor levels with the factor name seems odd
+
+  term_names <- paste0("^", attr(terms(object), "term.labels"))
+
+  colnames(mm) <- stringr::str_replace_all(
+    colnames(mm),
+    pattern = magrittr::set_names(rep("", length(term_names)), term_names)
+  )
+
+  mm
+  }
 ```
 
 ## Preamble
@@ -30,7 +69,7 @@ pkgs <- c(
   # CRAN
   "magrittr",
   # Bioconductor
-  "limma", "edgeR"
+  "limma", "edgeR", "ComplexHeatmap"
 )
 
 for (pkg in pkgs) {
@@ -165,41 +204,90 @@ Model:
 
 ## Design Matrices
 
+.pull-left[
 Encode the experimental / statistical design:
 
 - rows = samples
 - columns = model coefficients
 
-ExploreModelMatrix: https://csoneson.github.io/ExploreModelMatrix/
-
-```{r}
-design_heatmap <- function(...) {
-  heatmap(..., Rowv = NA, Colv = NA, scale = "none",
-    xlab = "Samples", ylab = "Coefficients",
-    col = c("white", "black"),
-    cexCol = 0.5
-  )
-}
-```
-
-.pull-left[
-```{r, design-heatmap, eval = FALSE, echo = TRUE, fig.height = half_height}
-# design_heatmap plots binary matrices as heatmaps
+```{r, design-heatmap, eval = FALSE, echo = TRUE}
+# `design_heatmap` plots binary matrices as heatmaps
+# `factor_model` wraps `model.matrix` - but doesn't prefix with the factor name
 design_heatmap(
-  model.matrix(
-    ~ treatment,
-    data = dge$samples))
+  factor_model(
+    ~ cell + treatment,
+    data = dge$samples)
+) +
+  rowAnnotation(
+    df = dge$samples[, c("cell", "batch", "treatment")]
+  )
 ```
+
+See also: ExploreModelMatrix
+
+- https://csoneson.github.io/ExploreModelMatrix/
 ]
 
 .pull-right[
-```{r, design-heatmap-out, ref.label = "design-heatmap", echo = FALSE}
+```{r, design-heatmap-out, ref.label = "design-heatmap", echo = FALSE, fig.height = height.75}
 ```
 ]
 
 ---
 
-## The 'transform to normality' approach: `lm()`
+## The 'transform to _normality_' approach: `lm()`
+
+```{r}
+design <- factor_model(~ cell + treatment, data = dge$samples)
+dge_voom <- voom(dge, design = design)
+
+```
+
+---
+
+## Equivalent Design Matrices
+
+```{r}
+hm1 <- design_heatmap(
+  factor_model(~ cell + treatment, data = dge$samples),
+  column_title = "~ cell + treatment[baseline:sh55]",
+  name = "design_1"
+)
+```
+
+```{r}
+ra <- rowAnnotation(df = dge$samples[, c("cell", "batch", "treatment")])
+```
+
+```{r}
+hm2 <- design_heatmap(
+  factor_model(
+    ~ -1 + cell + treatment,
+    data = dplyr::mutate(
+      dge$samples, treatment = relevel(factor(treatment), "shct"))
+    ),
+  column_title = "~ -1 + cell + treatment[baseline:shct]",
+  name = "design_2"
+)
+```
+
+```{r, fig.width = 10}
+draw(hm1 + ra + hm2, ht_gap = unit(3, "cm"))
+
+f <- function(i0) {
+  i <- i0
+  y <- c(i0 - 1, i0) / nrow(dge$samples)
+  grid.lines(c(0, 1), y[1], gp = gpar(col = "red"))
+  grid.lines(c(0, 1), y[2], gp = gpar(col = "red"))
+}
+
+decorate_heatmap_body("design_1", f(7))
+decorate_heatmap_body("design_2", f(7))
+```
+
+---
+
+## The 'borrow information' approach: `limma`
 
 ---
 
