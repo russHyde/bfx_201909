@@ -33,7 +33,7 @@ rule get_gse103528:
 
     shell:
         """
-            bash ./scripts/data_download.sh
+            bash ./scripts/GSE103528/data_download.sh
         """
 
 rule reformat_gse103528:
