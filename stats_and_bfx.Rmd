@@ -163,6 +163,46 @@ Model:
 
 ---
 
+## Design Matrices
+
+Encode the experimental / statistical design:
+
+- rows = samples
+- columns = model coefficients
+
+ExploreModelMatrix: https://csoneson.github.io/ExploreModelMatrix/
+
+```{r}
+design_heatmap <- function(...) {
+  heatmap(..., Rowv = NA, Colv = NA, scale = "none",
+    xlab = "Samples", ylab = "Coefficients",
+    col = c("white", "black"),
+    cexCol = 0.5
+  )
+}
+```
+
+.pull-left[
+```{r, design-heatmap, eval = FALSE, echo = TRUE, fig.height = half_height}
+# design_heatmap plots binary matrices as heatmaps
+design_heatmap(
+  model.matrix(
+    ~ treatment,
+    data = dge$samples))
+```
+]
+
+.pull-right[
+```{r, design-heatmap-out, ref.label = "design-heatmap", echo = FALSE}
+```
+]
+
+---
+
+## The 'transform to normality' approach: `lm()`
+
+---
+
 ## Some Univariate Distibutions
 
 ```{r, echo = FALSE}
@@ -175,14 +215,6 @@ knitr::include_graphics(url)
 ```
 
 Source: Ehsan Azhdari [CC BY-SA 3.0] via Wikipedia
-
----
-
-## Design Matrices
-
----
-
-## The 'transform to normality' approach: `lm()`
 
 ---
 
