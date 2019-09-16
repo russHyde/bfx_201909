@@ -1,9 +1,9 @@
 # Usage:
 # - Rscript ./path/to/rsem_to_dgelist.R \
 #       --rsem <RSEM FILE> \
-#       --gene-details <GENE_DETAILS TSV FILE>
-#       --sample-details <SAMPLE DETAILS TSV FILE>
-#       --out <OUTPUT .RData file>
+#       --genes <GENE_DETAILS TSV FILE>
+#       --samples <SAMPLE DETAILS TSV FILE>
+#       --out <OUTPUT .rds file>
 #
 # The row names in <RSEM FILE> should match the `gene_id` column in the <GENE
 # DETAILS FILE>
@@ -18,37 +18,23 @@
 # names and the <SAMPLE DETAILS> `sample_id` column
 #
 ###############################################################################
+# Dependencies:
 
 suppressPackageStartupMessages({
   library(argparse)
   library(magrittr)
-  library(stringr)
+  library(readr)
+
   library(Biobase)
   library(edgeR)
 })
 
 ###############################################################################
 
-format_names <- function(x) {
-  x %>%
-    stringr::str_replace_all(c("^\\W+" = "", "\\W+" = "_")) %>%
-    tolower()
-}
+helper_path <- file.path("scripts", "lib", "helpers.R")
+source(helper_path)
 
-import_rsem <- function(path) {
-  # read
-  table <- as.matrix(read.csv(path, sep = "\t", row.names = 1))
-
-  # format
-  # - rownames should be ensembl IDs
-  # - colnames are modified on import
-  # - the values contained should be floored, so they can be used in edgeR /
-  # voom etc
-  colnames(table) <- format_names(colnames(table))
-  table <- floor(table)
-
-  table
-}
+###############################################################################
 
 import_genes <- function(path) {
   # import as tibble and convert to data.frame (pushing gene IDs into rownames)
