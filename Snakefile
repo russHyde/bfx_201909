@@ -5,15 +5,22 @@
 # location
 # - Therefore, we wrote a script to download the files using bash
 
+###############################################################################
+
 local_rsem = "data/ext/GSE103528_RSEM.gene.results.txt.gz"
 ensembled_rsem = "data/ext/GSE103528_RSEM.gene.results.ensembl.tsv"
 local_gtf = "data/ext/Homo_sapiens.GRCh38.87.gtf.gz"
 gene_details = "data/ext/Homo_sapiens.GRCh38.87.gene_details.tsv"
 
+dgelist = "data/job/GSE103528_RSEM.gene.results.ensembl.dgelist.rds"
+
+###############################################################################
+
 rule all:
     input:
         gene_details,
-        ensembled_rsem
+        ensembled_rsem,
+        dgelist
 
 rule get_gse103528:
     message:
@@ -77,4 +84,28 @@ rule gene_details:
         "data/ext/{prefix}.gene_details.tsv"
 
     shell:
-        "Rscript ./scripts/ensembl_details.R --gtf {input} --out {output}"
+        """
+            Rscript ./scripts/ensembl_details.R --gtf {input} --out {output}
+        """
+
+rule make_dgelist:
+    message:
+        """
+        --- Convert an RSEM dataset into an integer DGEList
+        """
+
+    input:
+        tsv = "data/ext/{prefix}.ensembl.tsv",
+        genes = "data/ext/Homo_sapiens.GRCh38.87.gene_details.tsv",
+        script = "scripts/rsem_to_dgelist.R"
+
+    output:
+        "data/job/{prefix}.ensembl.dgelist.rds"
+
+    shell:
+        """
+            Rscript {input.script} \
+                --rsem {input.tsv} \
+                --genes {input.genes} \
+                --out {output}
+        """
