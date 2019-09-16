@@ -1,9 +1,10 @@
 ---
-title: "Stats & Bioinformatics"
+title: "A Link To The Past"
+subtitle: "Statistical connections within the bioinformatics toolkit"
 author: "Russ Hyde"
-date: "14 August 2019"
+date: "30th September 2019"
 output:
-    ioslides_presentation
+  xaringan::moon_reader
 ---
 
 ```{r setup, include=FALSE}
