@@ -57,7 +57,11 @@ import_genes <- function(path) {
 }
 
 import_samples <- function(path) {
-  NULL
+  samples <- readr::read_tsv(path)
+
+  as.data.frame(
+    samples, row.names = samples$sample_id, stringsAsFactors = FALSE
+  )
 }
 
 construct_dgelist <- function(counts, genes, samples) {
@@ -65,7 +69,7 @@ construct_dgelist <- function(counts, genes, samples) {
     NULL
   } else {
     merge(
-      data.frame(gene_id = row.names(counts), stringsAsFactors = FALSE),
+      data.frame(gene_id = rownames(counts), stringsAsFactors = FALSE),
       genes,
       all.x = TRUE
     ) %>%
@@ -74,7 +78,22 @@ construct_dgelist <- function(counts, genes, samples) {
     )
   }
 
-  edgeR::DGEList(counts = counts, genes = reordered_genes)
+  reordered_samples <- if (is.null(samples)) {
+    NULL
+  } else {
+    merge(
+      data.frame(sample_id = colnames(counts), stringsAsFactors = FALSE),
+      samples,
+      all.x = TRUE
+    ) %>%
+    set_rownames(.$sample_id)
+  }
+
+  edgeR::DGEList(
+    counts = counts,
+    genes = reordered_genes,
+    samples = reordered_samples
+  )
 }
 
 ###############################################################################

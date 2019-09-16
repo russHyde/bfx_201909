@@ -12,7 +12,8 @@ ensembled_rsem = "data/ext/GSE103528_RSEM.gene.results.ensembl.tsv"
 local_gtf = "data/ext/Homo_sapiens.GRCh38.87.gtf.gz"
 gene_details = "data/ext/Homo_sapiens.GRCh38.87.gene_details.tsv"
 
-dgelist = "data/job/GSE103528_RSEM.gene.results.ensembl.dgelist.rds"
+sample_details = "data/job/GSE103528.samples.tsv"
+dgelist = "data/job/GSE103528.dgelist.rds"
 
 ###############################################################################
 
@@ -20,6 +21,7 @@ rule all:
     input:
         gene_details,
         ensembled_rsem,
+        sample_details,
         dgelist
 
 rule get_gse103528:
@@ -88,6 +90,24 @@ rule gene_details:
             Rscript ./scripts/ensembl_details.R --gtf {input} --out {output}
         """
 
+rule sample_details:
+    message:
+        """
+        --- Extract sample/treatment data from {input}
+        """
+
+    input:
+        tsv = "data/ext/{gse_id}_RSEM.gene.results.ensembl.tsv",
+        script = "scripts/{gse_id}/rsem_to_samples.R"
+
+    output:
+        "data/job/{gse_id}.samples.tsv"
+
+    shell:
+        """
+            Rscript {input.script} --rsem {input.tsv} --out {output}
+        """
+
 rule make_dgelist:
     message:
         """
@@ -95,17 +115,19 @@ rule make_dgelist:
         """
 
     input:
-        tsv = "data/ext/{prefix}.ensembl.tsv",
+        tsv = "data/ext/{gse_id}_RSEM.gene.results.ensembl.tsv",
         genes = "data/ext/Homo_sapiens.GRCh38.87.gene_details.tsv",
+        samples = "data/job/{gse_id}.samples.tsv",
         script = "scripts/rsem_to_dgelist.R"
 
     output:
-        "data/job/{prefix}.ensembl.dgelist.rds"
+        "data/job/{gse_id}.dgelist.rds"
 
     shell:
         """
             Rscript {input.script} \
                 --rsem {input.tsv} \
                 --genes {input.genes} \
+                --samples {input.samples} \
                 --out {output}
         """
