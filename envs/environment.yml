@@ -5,8 +5,6 @@ channels:
   - russh
   - r
   - defaults
-  - biobuilds
-  - terradue
 dependencies:
   - _libgcc_mutex=0.1
   - _r-mutex=1.0.1
@@ -19,6 +17,24 @@ dependencies:
   - bcrypt=3.1.4
   - binutils_impl_linux-64=2.31.1
   - binutils_linux-64=2.31.1
+  - bioconductor-biobase=2.42.0
+  - bioconductor-biocgenerics=0.28.0
+  - bioconductor-biocparallel=1.16.6
+  - bioconductor-biostrings=2.50.2
+  - bioconductor-delayedarray=0.8.0
+  - bioconductor-edger=3.26.0
+  - bioconductor-genomeinfodb=1.18.1
+  - bioconductor-genomeinfodbdata=1.2.0
+  - bioconductor-genomicalignments=1.18.1
+  - bioconductor-genomicranges=1.34.0
+  - bioconductor-iranges=2.16.0
+  - bioconductor-limma=3.40.0
+  - bioconductor-rsamtools=1.34.0
+  - bioconductor-rtracklayer=1.42.1
+  - bioconductor-s4vectors=0.20.1
+  - bioconductor-summarizedexperiment=1.12.0
+  - bioconductor-xvector=0.22.0
+  - bioconductor-zlibbioc=1.28.0
   - blas=2.12
   - boto3=1.9.88
   - botocore=1.12.224
@@ -152,6 +168,7 @@ dependencies:
   - pytz=2019.2
   - pyyaml=3.13
   - qt=5.6.3
+  - r-argparse=2.0.1
   - r-askpass=1.1
   - r-assertthat=0.2.1
   - r-backports=1.1.4
@@ -176,9 +193,14 @@ dependencies:
   - r-ellipsis=0.2.0.1
   - r-evaluate=0.14
   - r-fansi=0.4.0
+  - r-findpython=1.0.5
   - r-forcats=0.4.0
   - r-forge=0.2.0
+  - r-formatr=1.7
+  - r-futile.logger=1.4.3
+  - r-futile.options=1.0.1
   - r-generics=0.0.2
+  - r-getopt=1.20.3
   - r-glue=1.3.1
   - r-haven=2.1.1
   - r-highr=0.8
@@ -189,9 +211,14 @@ dependencies:
   - r-httr=1.4.1
   - r-jsonlite=1.6
   - r-knitr=1.24
+  - r-lambda.r=1.2.3
   - r-later=0.8.0
+  - r-lattice=0.20_38
+  - r-locfit=1.5_9.1
   - r-magrittr=1.5
   - r-markdown=1.1
+  - r-matrix=1.2_17
+  - r-matrixstats=0.55.0
   - r-mime=0.7
   - r-miniui=0.1.1.1
   - r-mongolite=2.0
@@ -225,6 +252,7 @@ dependencies:
   - r-rstudioapi=0.10
   - r-servr=0.15
   - r-shiny=1.3.2
+  - r-snow=0.4_3
   - r-sourcetools=0.1.7
   - r-sparklyr=1.0.2
   - r-stringi=1.4.3
@@ -239,6 +267,7 @@ dependencies:
   - r-withr=2.1.2
   - r-xaringan=0.11
   - r-xfun=0.8
+  - r-xml=3.98_1.20
   - r-xml2=1.2.2
   - r-xtable=1.8_4
   - r-yaml=2.2.0
@@ -259,6 +288,7 @@ dependencies:
   - tktable=2.10
   - unixodbc=2.3.7
   - urllib3=1.23
+  - wget=1.19.5
   - wheel=0.32.0
   - wrapt=1.10.11
   - xmlrunner=1.7.7
