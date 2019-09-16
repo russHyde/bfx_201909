@@ -9,14 +9,41 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+half_height = 4
 ```
 
-# A Link To The Past:  Statistical connections within the bioinformatics toolkit
+## Preamble
 
+Github:
+
+- https://www.github.com/russHyde/bfx_201909
+
+Dataset:
+
+- [GSE103528](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE103528)
+
+R Packages:
+
+```{r, echo = TRUE}
+# format: xaringan
+pkgs <- c(
+  # CRAN
+  "magrittr",
+  # Bioconductor
+  "limma", "edgeR"
+)
+
+for (pkg in pkgs) {
+  suppressPackageStartupMessages(
+    library(pkg, character.only = TRUE))
+}
+```
+
+---
 
 ## The Dataset
 
-GSE103528
+[GSE103528](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE103528)
 
 - Sources of variability:
 
@@ -57,6 +84,7 @@ resp)
 
 ... plus lots of assumptions
 
+---
 
 ## The Simplest Model (in practice)
 
@@ -123,6 +151,8 @@ Model:
   There is _no_ one simplest model
 -->
 
+---
+
 ## Some Univariate Distibutions
 
 ```{r, echo = FALSE}
@@ -130,17 +160,33 @@ Model:
 url <- "./figures/Relationships_among_some_of_univariate_probability_distributions.jpg"
 ```
 
-![](`r url`){ width=100% }
+```{r}
+knitr::include_graphics(url)
+```
 
 Source: Ehsan Azhdari [CC BY-SA 3.0] via Wikipedia
 
+---
+
+## Design Matrices
+
+---
+
 ## The 'transform to normality' approach: `lm()`
+
+---
 
 ## The 'borrow information' approach: `limma`
 
+---
+
 ## The 'count all the things' approach: `edgeR` / `DESeq2`
 
+---
+
 ## The Statistical Philosophies
+
+---
 
 ## The 'batch-effects are random variables' approach (`lme4`)
 
@@ -148,7 +194,11 @@ Source: Ehsan Azhdari [CC BY-SA 3.0] via Wikipedia
 
 <!-- variancePartition::dream() -->
 
+---
+
 ## The 'everything is a random variable' approach (`stan` / `jags`)
+
+---
 
 ## The 'beyond the scope of the talk, and of my explanatory powers' approaches ...
 
