@@ -107,11 +107,22 @@ dge <- dge[dge$genes$gene_biotype == "protein_coding", ]
 dim(dge)
 ```
 
-```{r, echo = TRUE, fig.height = half_height, fig.align = "center"}
+.pull-left[
+
+```{r density, eval = FALSE, echo = TRUE}
 dge %>%
   edgeR::cpm(log = TRUE) %>%
-  limma::plotDensities(legend = FALSE, main = "Density of log-CPM")
+  limma::plotDensities(
+    legend = FALSE,
+    main = "Density of log-CPM"
+    )
 ```
+]
+
+.pull-right[
+```{r, density-out, ref.label = "density", echo = FALSE, fig.height = height.5}
+```
+]
 
 ---
 
@@ -303,10 +314,6 @@ knitr::include_graphics(url)
 ```
 
 Source: Ehsan Azhdari [CC BY-SA 3.0] via Wikipedia
-
----
-
-## The 'borrow information' approach: `limma`
 
 ---
 
