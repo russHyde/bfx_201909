@@ -126,7 +126,7 @@ dge %>%
 
 ---
 
-## The Simplest Model (in shorthand)
+## A Simple Class of Models (shorthand)
 
 $$\mathbf{y} \sim \mathcal{N} \left(X\boldsymbol{\beta}, \sigma^2I \right)$$
 
@@ -146,7 +146,7 @@ resp)
 
 ---
 
-## The Simplest Model (in practice)
+## ... And In Practice
 
 $$\mathbf{y} \sim \mathcal{N} \left(X\boldsymbol{\beta}, \sigma^2I \right)$$
 
@@ -164,52 +164,6 @@ $\boldsymbol{\beta}$ - how much does each predictor contribute ...
 $\sigma$ - and how much noise is there around ...
 
 ... the fitted values
-
-<!-- TODO: Generalisation:
-    - Multiple 'y'
-      - repeated measures
-      - different genes
-    - _N_ -> ARBITRARY_DIST(params)
-    - Fixed effects -> Mixed effects: modification of X
--->
-
-<!--
-
-## The Simplest Model (Assumptions)
-
-Residuals:
-
-- IID normal
-
-- mean 0 for all values of predictor variables
-
-Model:
-
-- The model is correct ...
-
-- Predictors are fixed and have no errors
-
-- Single source of unaccounted noise
-
--->
-
-<!--
-  - How should the dependent variable be modelled
-  - How should the explanatory / independent variables be incorporated
-  - What should be estimated
-  - What should be controlled
-  - How should the covariates be controlled
-  - How should uncertainties in mapping, biases in library composition etc etc
-  be incorporated
--->
-
-<!--
-  Illustrate with a single gene from the example dataset
--->
-
-<!--
-  There is _no_ one simplest model
--->
 
 ---
 
@@ -266,7 +220,6 @@ p_carm1 <- df_carm1 %>%
   geom_boxplot() +
   facet_wrap(~ cell) +
   labs(
-    title = "Anyone spot it yet?",
     y = "Normalised CARM1 intensity (log2)")
 ```
 
@@ -278,7 +231,39 @@ p_carm1
 
 ## `lm()` (cont.)
 
+```{r}
+lm_carm1 <- lm(intensity ~ cell + treatment, data = df_carm1)
+lm_carm1
+```
 
+Baselines (for cell: MOLM13; for treatment: sh55)
+
+Fitted values:
+
+- [SKNO1, shControl]:
+
+    - (Intercept) + cellskno1 + treatmentsshct
+
+```{r, echo = TRUE}
+with(
+  lm_carm1,
+  sum(coefficients[c("(Intercept)", "cellskno1", "treatmentshct")]))
+```
+
+---
+
+But
+- `design` is a N x K matrix (here, binary)
+- `coefficients` is K x 1 vector (entries ~ columns of the design)
+
+What is the matrix * vector product?
+
+```{r, echo = TRUE}
+(
+  design %*% lm_carm1$coefficients
+  ) %>%
+  tail(n = 12)
+```
 
 ---
 
@@ -321,6 +306,8 @@ f <- function(i0) {
 decorate_heatmap_body("design_1", f(7))
 decorate_heatmap_body("design_2", f(7))
 ```
+
+LHS `skno1` != RHS `skno1` coef
 
 ---
 
@@ -374,3 +361,49 @@ Source: Ehsan Azhdari [CC BY-SA 3.0] via Wikipedia
 - dynamic modelling of gene expression ...
 
 - the cell population milkshake ...
+
+<!-- TODO: Generalisation:
+    - Multiple 'y'
+      - repeated measures
+      - different genes
+    - _N_ -> ARBITRARY_DIST(params)
+    - Fixed effects -> Mixed effects: modification of X
+-->
+
+<!--
+
+## The Simplest Model (Assumptions)
+
+Residuals:
+
+- IID normal
+
+- mean 0 for all values of predictor variables
+
+Model:
+
+- The model is correct ...
+
+- Predictors are fixed and have no errors
+
+- Single source of unaccounted noise
+
+-->
+
+<!--
+  - How should the dependent variable be modelled
+  - How should the explanatory / independent variables be incorporated
+  - What should be estimated
+  - What should be controlled
+  - How should the covariates be controlled
+  - How should uncertainties in mapping, biases in library composition etc etc
+  be incorporated
+-->
+
+<!--
+  Illustrate with a single gene from the example dataset
+-->
+
+<!--
+  There is _no_ one simplest model
+-->
