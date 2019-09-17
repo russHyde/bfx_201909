@@ -1,0 +1,15 @@
+---
+
+# Git repositories that are to be cloned into the current project
+# - `url` can either be a github/bitbucket or other external repo or a
+# directory on the user's computer (though I'd urge against the latter)
+# - `commit` should be (at least) the 7-mer prefix for the specific commit that
+# is to be checked out (use the SHA1 code, not HEAD/MASTER or similar since
+# only the former is future proof)
+# - `output` should be defined relative to the current project's working
+# directory (don't use full filepaths)
+
+# repo_identifier:
+#     url: git@github.com:user/my_package.git
+#     commit: zyx9876
+#     output: ./lib/cloned_packages/my_package

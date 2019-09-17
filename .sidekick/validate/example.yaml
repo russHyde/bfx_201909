@@ -1,0 +1,3 @@
+test1:
+    input_file: some/file/relative/to/project/or/subjob/root
+    expected_md5sum: 9876543210abcdef...

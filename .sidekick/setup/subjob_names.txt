@@ -1,0 +1,4 @@
+# Enter the names of any subjobs of the current job in the order that they
+# should be set-up
+
+# Each subjob should be present in ./subjobs/<subjob_name>

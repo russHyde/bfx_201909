@@ -1,0 +1,17 @@
+# Links that must be made before running the current job
+# File format:
+# - ^# This is a comment$
+# - <BLANK LINES ARE DROPPED>
+# - ^path/to/target/file ./local/path/to/linkname$
+# - ~/tildes/are/valid
+# - one line per link
+#
+# Relative paths for the targets should be written WRT the working directory
+# for the current project (not WRT the subdirectory in which the link will be
+# stored or the subdirectory in which make_these_links.txt is stored) ie,
+# "../../some.target ./subdir/some.link" results in the link
+# "./subdir/some.link -> ../../../some.target" when viewed with "ls -l"
+
+# Example:
+# ~/ext_data/GEOquery ./data/ext/GEOquery
+# ../../some.target ./subdir/some.link

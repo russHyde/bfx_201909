@@ -31,8 +31,7 @@ suppressPackageStartupMessages({
 
 ###############################################################################
 
-helper_path <- file.path("scripts", "lib", "helpers.R")
-source(helper_path)
+library(bfx.201909)
 
 ###############################################################################
 

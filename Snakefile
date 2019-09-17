@@ -5,6 +5,10 @@
 # location
 # - Therefore, we wrote a script to download the files using bash
 
+from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
+
+http = HTTPRemoteProvider()
+
 ###############################################################################
 
 local_rsem = "data/ext/GSE103528_RSEM.gene.results.txt.gz"
@@ -15,6 +19,8 @@ gene_details = "data/ext/Homo_sapiens.GRCh38.87.gene_details.tsv"
 sample_details = "data/job/GSE103528.samples.tsv"
 dgelist = "data/job/GSE103528.dgelist.rds"
 
+html_report = "doc/stats_and_bfx.html"
+
 ###############################################################################
 
 rule all:
@@ -22,7 +28,22 @@ rule all:
         gene_details,
         ensembled_rsem,
         sample_details,
-        dgelist
+        dgelist,
+        html_report
+
+rule get_probability_figure:
+    input:
+        http.remote(
+            "upload.wikimedia.org/wikipedia/commons/6/69/Relationships_among_some_of_univariate_probability_distributions.jpg",
+            keep_local=True)
+
+    output:
+        "figures/Relationships_among_some_of_univariate_probability_distributions.jpg"
+
+    shell:
+        """
+            mv {input} {output}
+        """
 
 rule get_gse103528:
     message:
@@ -131,3 +152,24 @@ rule make_dgelist:
                 --samples {input.samples} \
                 --out {output}
         """
+
+rule compile_rmarkdown:
+    message:
+        """
+        --- Compile the Rmarkdown report to a xaringan presentation
+
+            input: {input}
+            output: {output}
+        """
+
+    input:
+        report = "doc/stats_and_bfx.Rmd",
+        dgelist = "data/job/GSE103528.dgelist.rds",
+        probdists = "figures/Relationships_among_some_of_univariate_probability_distributions.jpg"
+
+    output:
+        "doc/stats_and_bfx.html"
+
+    script:
+        "{input.report}"
+

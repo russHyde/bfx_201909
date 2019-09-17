@@ -1,0 +1,8 @@
+# File format:
+# - ^path/to/file/to_be_copied ./path/to/local/copy$
+# - One line per file
+# - Paths relative to working directory (ie, the dir containing conf/ doc/
+# scripts/ etc)
+
+# Example:
+# ../infx_scripts/r_functions/rh_data_manipulation.R      ./lib/global_rfuncs/R/rh_data_manipulation.R

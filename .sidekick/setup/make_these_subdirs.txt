@@ -1,0 +1,35 @@
+# Internal subdirectories that must be created prior to running the workflow
+
+# File format:
+# - ^relative/path/to/dir$
+# - One line per directory
+# - Paths relative to working directory (ie, the dir containing conf/ doc/
+# scripts/ etc)
+
+# Examples:
+# bin
+# data/ext_data/GEOquery
+# ./temp
+
+# Defaults for a new project/subproject:
+./conf
+./data
+./data/ext
+./data/int
+./data/job
+./doc/figure
+./envs
+./lib/built_packages
+./lib/copied_packages
+./lib/cloned_packages
+./lib/global_rfuncs
+./lib/global_rfuncs/R
+./lib/global_rfuncs/tests
+./lib/global_rfuncs/tests/testthat
+./lib/local_rfuncs
+./lib/local_rfuncs/R
+./lib/local_rfuncs/tests
+./lib/local_rfuncs/tests/testthat
+./results
+./scripts/snake_recipes
+./temp

@@ -1,0 +1,11 @@
+# File format:
+# - ^path/to/dir/to_be_copied ./path/to/local/copy$
+# - One line per file
+# - Paths relative to working directory (ie, the dir containing conf/ doc/
+# scripts/ etc)
+# - note that .git subfolder and .gitignore will not be copied
+# - put trailing backslash on the source directory but not the destination
+
+# Example:
+# 1) copy the contents of ../copy_me into ./lib/copy_me
+# ../copy_me/ ./lib/copy_me
