@@ -32,7 +32,7 @@ then
 fi
 
 # ENVNAME is the name of the job-specific conda environment
-export ENVNAME="bfx_vanguard"
+export ENVNAME="bfx_201909"
 
 ###############################################################################
 if [[ ! -z "${IS_JUPYTER_R_REQUIRED}" ]] && [[ ${IS_JUPYTER_R_REQUIRED} -ne 0 ]];
