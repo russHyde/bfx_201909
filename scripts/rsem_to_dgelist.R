@@ -68,25 +68,15 @@ construct_dgelist <- function(counts, genes, samples) {
   reordered_genes <- if (is.null(genes)) {
     NULL
   } else {
-    merge(
-      data.frame(gene_id = rownames(counts), stringsAsFactors = FALSE),
-      genes,
-      all.x = TRUE
-    ) %>%
-    set_rownames(
-      .$gene_id
-    )
+    rownames(genes) <- genes$gene_id
+    genes[match(rownames(counts), genes$gene_id), ]
   }
 
   reordered_samples <- if (is.null(samples)) {
     NULL
   } else {
-    merge(
-      data.frame(sample_id = colnames(counts), stringsAsFactors = FALSE),
-      samples,
-      all.x = TRUE
-    ) %>%
-    set_rownames(.$sample_id)
+    rownames(samples) <- samples$sample_id
+    samples[match(colnames(counts), samples$sample_id), ]
   }
 
   edgeR::DGEList(
