@@ -1,30 +1,132 @@
 ---
-title: "Stats & Bioinformatics"
+title: "A Link To The Past"
+subtitle: "Statistical connections within the bioinformatics toolkit"
 author: "Russ Hyde"
-date: "14 August 2019"
+date: "30th September 2019"
 output:
-    ioslides_presentation
+  xaringan::moon_reader
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+height.5 = 6
+height.75 = 9
+set.seed(3)
 ```
 
-# A Link To The Past:  Statistical connections within the bioinformatics toolkit
+```{r}
+design_heatmap <- function(
+  ...,
+  row_title = "Samples",
+  column_title = "Coefficients"
+) {
+  ComplexHeatmap::Heatmap(...,
+    col = c("0" = "grey87", "1" = "black"),
+    cluster_rows = FALSE,
+    cluster_columns = FALSE,
+    row_title = row_title,
+    column_title = column_title
+  )
+}
+```
 
+```{r}
+factor_model <- function(
+  object, ...
+) {
+  stopifnot(is(object, "formula"))
+
+  mm <- stats::model.matrix(object, ...)
+
+  # prefixing the factor levels with the factor name seems odd
+
+  term_names <- paste0("^", attr(terms(object), "term.labels"))
+
+  colnames(mm) <- stringr::str_replace_all(
+    colnames(mm),
+    pattern = magrittr::set_names(rep("", length(term_names)), term_names)
+  )
+
+  mm
+  }
+```
+
+## Preamble
+
+Github:
+
+- https://www.github.com/russHyde/bfx_201909
+
+Dataset:
+
+- [GSE103528](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE103528)
+
+R Packages:
+
+```{r, echo = TRUE}
+# format: xaringan
+pkgs <- c(
+  # CRAN
+  "magrittr", "ggplot2",
+  # Bioconductor
+  "limma", "edgeR", "ComplexHeatmap"
+)
+
+for (pkg in pkgs) {
+  suppressPackageStartupMessages(
+    library(pkg, character.only = TRUE))
+}
+```
+
+---
 
 ## The Dataset
 
-<!--
-  TODO:
-  - download some external dataset that has multiple nested levels
-  - eg, GSE103528: three treatments, three cell lines, duplicates for each cell
-  line
-  - Convert it to a count matrix for use in edgeR, limma etc
--->
+[GSE103528](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE103528)
 
+- Sources of variability:
 
-## The Simplest Model (in shorthand)
+    - 3x AML cell lines (Acute myeloid leukaemia)
+    - 3x treatments ("Scramble", and two shRNAs vs _CARM1_ (aka _PRMT4_))
+    - Triplicates (not obvious: are replicates batches?)
+
+- Data:
+
+    - Star / RSEM / GRCh38 / Ensembl-87
+    - (@russHyde should have aligned the data and used actual counts
+        - but life's too short
+        - he just `floor`ed the RSEM values)
+
+---
+
+## The Dataset (cont.)
+
+```{r, echo = TRUE, message = FALSE}
+dge <- readRDS(file.path("data", "job", "GSE103528.dgelist.rds"))
+dge <- dge[dge$genes$gene_biotype == "protein_coding", ]
+dim(dge)
+```
+
+.pull-left[
+
+```{r density, eval = FALSE, echo = TRUE}
+dge %>%
+  edgeR::cpm(log = TRUE) %>%
+  limma::plotDensities(
+    legend = FALSE,
+    main = "Density of log-CPM"
+    )
+```
+]
+
+.pull-right[
+```{r, density-out, ref.label = "density", echo = FALSE, fig.height = height.5}
+```
+]
+
+---
+
+## A Simple Class of Models (shorthand)
 
 $$\mathbf{y} \sim \mathcal{N} \left(X\boldsymbol{\beta}, \sigma^2I \right)$$
 
@@ -42,8 +144,9 @@ resp)
 
 ... plus lots of assumptions
 
+---
 
-## The Simplest Model (in practice)
+## ... And In Practice
 
 $$\mathbf{y} \sim \mathcal{N} \left(X\boldsymbol{\beta}, \sigma^2I \right)$$
 
@@ -61,6 +164,203 @@ $\boldsymbol{\beta}$ - how much does each predictor contribute ...
 $\sigma$ - and how much noise is there around ...
 
 ... the fitted values
+
+---
+
+## Design Matrices
+
+.pull-left[
+Encode the experimental / statistical design:
+
+- rows = samples
+- columns = model coefficients
+
+```{r, design-heatmap, eval = FALSE, echo = TRUE}
+# `design_heatmap` plots binary matrices as heatmaps
+# `factor_model` wraps `model.matrix` - but doesn't prefix with the factor name
+design_heatmap(
+  factor_model(
+    ~ cell + treatment,
+    data = dge$samples)
+) +
+  rowAnnotation(
+    df = dge$samples[, c("cell", "batch", "treatment")]
+  )
+```
+
+See also: ExploreModelMatrix
+
+- https://csoneson.github.io/ExploreModelMatrix/
+]
+
+.pull-right[
+```{r, design-heatmap-out, ref.label = "design-heatmap", echo = FALSE, fig.height = height.75}
+```
+]
+
+---
+
+## The 'transform to _normality_' approach: `lm()`
+
+```{r, echo = TRUE}
+design <- factor_model(~ cell + treatment, data = dge$samples)
+dge_voom <- voom(dge, design = design)
+```
+
+```{r, echo = FALSE}
+df_carm1 <- data.frame(
+  intensity = dge_voom$E[dge_voom$genes$gene_name == "CARM1", ],
+  dge$samples
+)
+
+p_carm1 <- df_carm1 %>%
+  ggplot(
+    aes(x = treatment, y = intensity)
+  ) +
+  geom_boxplot() +
+  facet_wrap(~ cell) +
+  labs(
+    y = "Normalised CARM1 intensity (log2)")
+```
+
+```{r, fig.height = height.5, fig.pos = "center"}
+p_carm1
+```
+
+---
+
+## `lm()` (cont.)
+
+```{r}
+lm_carm1 <- lm(intensity ~ cell + treatment, data = df_carm1)
+lm_carm1
+```
+
+Baselines (for cell: MOLM13; for treatment: sh55)
+
+Fitted values:
+
+- [SKNO1, shControl]:
+
+    - (Intercept) + cellskno1 + treatmentsshct
+
+```{r, echo = TRUE}
+with(
+  lm_carm1,
+  sum(coefficients[c("(Intercept)", "cellskno1", "treatmentshct")]))
+```
+
+---
+
+But
+- `design` is a N x K matrix (here, binary)
+- `coefficients` is K x 1 vector (entries ~ columns of the design)
+
+What is the matrix * vector product?
+
+```{r, echo = TRUE}
+(
+  design %*% lm_carm1$coefficients
+  ) %>%
+  tail(n = 12)
+```
+
+---
+
+## Equivalent Design Matrices
+
+```{r}
+hm1 <- design_heatmap(
+  factor_model(~ cell + treatment, data = dge$samples),
+  column_title = "~ cell + treatment[baseline:sh55]",
+  name = "design_1"
+)
+```
+
+```{r}
+ra <- rowAnnotation(df = dge$samples[, c("cell", "batch", "treatment")])
+```
+
+```{r}
+hm2 <- design_heatmap(
+  factor_model(
+    ~ -1 + cell + treatment,
+    data = dplyr::mutate(
+      dge$samples, treatment = relevel(factor(treatment), "shct"))
+    ),
+  column_title = "~ -1 + cell + treatment[baseline:shct]",
+  name = "design_2"
+)
+```
+
+```{r, fig.width = 10}
+draw(hm1 + ra + hm2, ht_gap = unit(3, "cm"))
+
+f <- function(i0) {
+  i <- i0
+  y <- c(i0 - 1, i0) / nrow(dge$samples)
+  grid.lines(c(0, 1), y[1], gp = gpar(col = "red"))
+  grid.lines(c(0, 1), y[2], gp = gpar(col = "red"))
+}
+
+decorate_heatmap_body("design_1", f(7))
+decorate_heatmap_body("design_2", f(7))
+```
+
+LHS `skno1` != RHS `skno1` coef
+
+---
+
+## The 'borrow information' approach: `limma`
+
+---
+
+## Some Univariate Distibutions
+
+```{r, echo = FALSE}
+# source: wikipedia
+url <- "./figures/Relationships_among_some_of_univariate_probability_distributions.jpg"
+```
+
+```{r}
+knitr::include_graphics(url)
+```
+
+Source: Ehsan Azhdari [CC BY-SA 3.0] via Wikipedia
+
+---
+
+## The 'count all the things' approach: `edgeR` / `DESeq2`
+
+---
+
+## The Statistical Philosophies
+
+---
+
+## The 'batch-effects are random variables' approach (`lme4`)
+
+<!-- Voom with duplicate correlation -->
+
+<!-- variancePartition::dream() -->
+
+---
+
+## The 'everything is a random variable' approach (`stan` / `jags`)
+
+---
+
+## The 'beyond the scope of the talk, and of my explanatory powers' approaches ...
+
+- genes aren't independent of each other ...
+
+    - epigenomic context
+
+    - coregulatory modules
+
+- dynamic modelling of gene expression ...
+
+- the cell population milkshake ...
 
 <!-- TODO: Generalisation:
     - Multiple 'y'
@@ -107,42 +407,3 @@ Model:
 <!--
   There is _no_ one simplest model
 -->
-
-## Some Univariate Distibutions
-
-```{r, echo = FALSE}
-# source: wikipedia
-url <- "./figures/Relationships_among_some_of_univariate_probability_distributions.jpg"
-```
-
-![](`r url`){ width=100% }
-
-Source: Ehsan Azhdari [CC BY-SA 3.0] via Wikipedia
-
-## The 'transform to normality' approach: `lm()`
-
-## The 'borrow information' approach: `limma`
-
-## The 'count all the things' approach: `edgeR` / `DESeq2`
-
-## The Statistical Philosophies
-
-## The 'batch-effects are random variables' approach (`lme4`)
-
-<!-- Voom with duplicate correlation -->
-
-<!-- variancePartition::dream() -->
-
-## The 'everything is a random variable' approach (`stan` / `jags`)
-
-## The 'beyond the scope of the talk, and of my explanatory powers' approaches ...
-
-- genes aren't independent of each other ...
-
-    - epigenomic context
-
-    - coregulatory modules
-
-- dynamic modelling of gene expression ...
-
-- the cell population milkshake ...
