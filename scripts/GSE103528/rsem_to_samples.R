@@ -8,9 +8,7 @@ suppressPackageStartupMessages({
   library(tidyr)
 })
 
-helper_path <- file.path("scripts", "lib", "helpers.R")
-stopifnot(file.exists(helper_path))
-source(helper_path)
+library(bfx.201909)
 
 ###############################################################################
 

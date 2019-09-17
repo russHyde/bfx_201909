@@ -1,9 +1,12 @@
-suppressPackageStartupMessages({
-  library(stringr)
-  library(magrittr)
-})
 
 ###############################################################################
+
+#' format_sample_names
+#'
+#' @importFrom   magrittr   %>%
+#' @importFrom   stringr    str_replace_all
+#'
+#' @export
 
 format_sample_names <- function(x) {
   x %>%
@@ -12,6 +15,10 @@ format_sample_names <- function(x) {
 }
 
 ###############################################################################
+
+#' import_rsem
+#'
+#' @export
 
 import_rsem <- function(path) {
   # read

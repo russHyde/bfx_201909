@@ -14,7 +14,7 @@
 
 export JOBNAME="bfx_201909"
 export IS_R_REQUIRED=1
-export IS_R_PKG_REQUIRED=0
+export IS_R_PKG_REQUIRED=1
 export IS_JUPYTER_R_REQUIRED=0
 
 ###############################################################################
