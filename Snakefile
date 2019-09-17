@@ -23,6 +23,18 @@ html_report = "doc/stats_and_bfx.html"
 
 ###############################################################################
 
+figures = {
+    "Relationships_among_some_of_univariate_probability_distributions.jpg" : \
+        "upload.wikimedia.org/wikipedia/commons/6/69/Relationships_among_some_of_univariate_probability_distributions.jpg",
+    "gkv007fig1.jpg" : \
+        "www.ncbi.nlm.nih.gov/pmc/articles/PMC4402510/bin/gkv007fig1.jpg"
+}
+
+def get_figure_url(wildcards):
+    return http.remote(figures[wildcards["suffix"]], keep_local=True)
+
+###############################################################################
+
 rule all:
     input:
         gene_details,
@@ -31,14 +43,12 @@ rule all:
         dgelist,
         html_report
 
-rule get_probability_figure:
+rule download_figure:
     input:
-        http.remote(
-            "upload.wikimedia.org/wikipedia/commons/6/69/Relationships_among_some_of_univariate_probability_distributions.jpg",
-            keep_local=True)
+        get_figure_url
 
     output:
-        "figures/Relationships_among_some_of_univariate_probability_distributions.jpg"
+        "figures/{suffix}"
 
     shell:
         """
@@ -165,7 +175,8 @@ rule compile_rmarkdown:
     input:
         report = "doc/stats_and_bfx.Rmd",
         dgelist = "data/job/GSE103528.dgelist.rds",
-        probdists = "figures/Relationships_among_some_of_univariate_probability_distributions.jpg"
+        probdists = "figures/Relationships_among_some_of_univariate_probability_distributions.jpg",
+        limma_figure = "figures/gkv007fig1.jpg"
 
     output:
         "doc/stats_and_bfx.html"
