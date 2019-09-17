@@ -69,9 +69,9 @@ R Packages:
 # format: xaringan
 pkgs <- c(
   # CRAN
-  "magrittr", "ggplot2",
+  "dplyr", "magrittr", "ggplot2",
   # Bioconductor
-  "limma", "edgeR", "ComplexHeatmap"
+  "ComplexHeatmap", "edgeR", "limma"
 )
 
 for (pkg in pkgs) {
@@ -104,7 +104,7 @@ for (pkg in pkgs) {
 ## The Dataset (cont.)
 
 ```{r, echo = TRUE, message = FALSE}
-dge <- readRDS(file.path("data", "job", "GSE103528.dgelist.rds"))
+dge <- readRDS(here("data", "job", "GSE103528.dgelist.rds"))
 dge <- dge[dge$genes$gene_biotype == "protein_coding", ]
 dim(dge)
 ```
@@ -210,8 +210,10 @@ dge_voom <- voom(dge, design = design)
 ```
 
 ```{r, echo = FALSE}
+row_carm1 <- dge_voom$genes$gene_name == "CARM1"
+
 df_carm1 <- data.frame(
-  intensity = dge_voom$E[dge_voom$genes$gene_name == "CARM1", ],
+  intensity = dge_voom$E[row_carm1, ],
   dge$samples
 )
 
@@ -315,6 +317,75 @@ LHS `skno1` != RHS `skno1` coef
 
 ## The 'borrow information' approach: `limma`
 
+```{r, echo = FALSE}
+limma_fig <- here(
+  "figures",
+  "gkv007fig1.jpg"
+)
+
+limma_fig_caption <- "Source: Richie et al. Nuc. Acids Res. (2015)"
+```
+
+```{r limma, echo = FALSE, fig.cap=limma_fig_caption, out.width = '75%'}
+knitr::include_graphics(limma_fig)
+```
+
+---
+
+```{r, echo = TRUE, warning = FALSE}
+colnames(design)
+```
+
+```{r, echo = TRUE, warning = FALSE}
+contrasts <- limma::makeContrasts(
+  # baseline treatment is sh55, so (fit for sh55) - (fit for shCTRL)
+  # is (0) - (shct)
+  sh_55 = "-shct",
+  sh_57 = "sh57 - shct",
+  sh_average = "(sh57 - 2*shct) / 2",
+  levels = design
+)
+```
+
+```{r, echo = TRUE, warning = FALSE}
+# standard limma workflow
+# - vanilla linear model
+fit_raw <- limma::lmFit(dge_voom, design)
+# - estimate experimental contrasts
+fit_cont <- limma::contrasts.fit(fit_raw, contrasts = contrasts)
+# - moderated t-statistics (uses distribution of standard
+# errors for all features to better estimate that for a
+# given feature)
+fit_ebayes <- limma::eBayes(fit_cont)
+```
+
+---
+
+## ... 'information borrowing' does not affect 'fold-change'
+
+... but voom-contrasts `!=` the `lm()` estimates
+
+```{r}
+rbind(
+  fit_raw$coefficients[row_carm1, ] %*% contrasts,
+  fit_ebayes$coefficients[row_carm1, ],
+  lm_carm1$coefficients %*% contrasts
+) %>% set_rownames(
+  c("after limma::lmFit", "after limma::eBayes", "from `lm()`")
+)
+```
+
+"voom: Precision _weights_ unlock linear model analysis tools for RNA-seq read counts." Law et al (Genome Biol. 2014)
+
+```{r, echo = TRUE}
+with(
+  dge_voom[row_carm1, ],
+  lm.wfit(
+    x = design, y = as.vector(E), w = as.vector(weights)
+  )
+)$coefficients %*% contrasts
+```
+
 ---
 
 ## Some Univariate Distibutions
@@ -322,7 +393,6 @@ LHS `skno1` != RHS `skno1` coef
 ```{r, echo = FALSE}
 # source: wikipedia
 url <- here(
-  "doc",
   "figures",
   "Relationships_among_some_of_univariate_probability_distributions.jpg"
 )
