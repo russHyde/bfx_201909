@@ -1,11 +1,61 @@
-.Rproj.user
-.Rhistory
+# Cloned packages are commit-stamped, so we don't need to keep a local copy
+
+**/lib/cloned_packages
+
+# Job-specific package
+
+lib/bfx.201909
+
+# Data files / directories / archives
+
+data
 .RData
 .Ruserdata
-
-*.html
-
-.snakemake/
+*.gz
+*.zip
 
 stats_and_bfx_files/
-data/
+
+# Computed files
+
+**/lib/built_packages
+
+results
+man
+doc/figure
+stats_and_bfx_files/
+
+*.docx
+*.pptx
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.html
+*.jar
+
+# Application logs
+
+logs
+log.txt
+
+.snakemake
+.Rhistory
+*.Rcheck
+.ipynb_checkpoints
+
+# Development
+
+.idea
+
+# Temp files
+
+temp
+
+*.swp
+*.knit.md
+*.utf8.md
+
+# RStudio configs
+
+.Rproj.user

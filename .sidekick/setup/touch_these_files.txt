@@ -1,0 +1,13 @@
+# Job-specific files that must exist prior to running the workflow
+# The files are 'touch'ed if they do not exist at the point where the current
+#   job is setup (by calling ./scripts/setup.sh)
+
+# File format:
+# - ^relative/path/to/filename$
+# - One line per directory
+# - Paths relative to working directory (ie, the dir containing conf/ doc/
+# scripts/ etc)
+
+# Examples:
+# ./lib/conf/include_into_rpackage.txt
+# TODO.txt

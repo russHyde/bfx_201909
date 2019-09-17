@@ -1,0 +1,11 @@
+# External directories that must exist prior to running the workflow
+
+# `yaml` file format:
+# - ^- path/to/dir/to_be_checked$
+# - One line per directory
+# - Paths relative to working directory (ie, the dir containing conf/ doc/
+# scripts/ etc)
+
+# Example:
+# - ../infx_scripts
+# - ../infx_scripts/r_functions

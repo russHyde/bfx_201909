@@ -2,7 +2,7 @@
 title: "A Link To The Past"
 subtitle: "Statistical connections within the bioinformatics toolkit"
 author: "Russ Hyde"
-date: "30th September 2019"
+date: "30th September, 2019"
 output:
   xaringan::moon_reader
 ---
