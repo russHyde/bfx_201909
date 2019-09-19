@@ -4,16 +4,19 @@ subtitle: "Statistical connections within the bioinformatics toolkit"
 author: "Russ Hyde"
 date: "30th September, 2019"
 output:
-  xaringan::moon_reader
+  xaringan::moon_reader:
+    nature:
+      highlightLines: true
 ---
 
 ```{r setup, include=FALSE}
+library(here)
 knitr::opts_chunk$set(echo = FALSE)
+
 height.5 = 4
 height.75 = 6
 height.max = 8
 set.seed(3)
-library(here)
 ```
 
 ```{r}
@@ -202,7 +205,16 @@ See also: ExploreModelMatrix
 
 ---
 
-## The 'transform to _normality_' approach: `lm()`
+## The implicit generalisation: transform the outcome (`lm()`)
+
+If the residuals aren't normal(ish) in
+
+$$\mathbf{y} \sim \mathcal{N} \left(X\boldsymbol{\beta}, \sigma^2I \right)$$
+$$\downarrow$$
+$$\mathbf{Y} = f(\mathbf{y})$$
+$$\mathbf{Y} \sim \mathcal{N} \left(X\boldsymbol{\beta}, \sigma^2I \right)$$
+
+---
 
 ```{r, echo = TRUE}
 design <- factor_model(~ cell + treatment, data = dge$samples)
@@ -315,20 +327,15 @@ LHS `skno1` != RHS `skno1` coef
 
 ---
 
-## The 'borrow information' approach: `limma`
+## The 'borrow information' generalisation (`limma`)
 
-```{r, echo = FALSE}
-limma_fig <- here(
-  "figures",
-  "gkv007fig1.jpg"
-)
+$$\mathbf{y}_{[g_1]} \sim \mathcal{N} \left(X\boldsymbol{\beta}_{[g_1]}, \sigma^2_{[g_1]}I \right)$$
+$$\mathbf{y}_{[g_2]} \sim \mathcal{N} \left(X\boldsymbol{\beta}_{[g_2]}, \sigma^2_{[g_2]}I \right)$$
+$$\downarrow$$
 
-limma_fig_caption <- "Source: Richie et al. Nuc. Acids Res. (2015)"
-```
+$$\sigma_{g} : {balance\ between\ gene-specific\ estimate\ and\ global\ estimate}$$
+$$\mathbf{y}_{[g]} \sim \mathcal{N} \left(X\boldsymbol{\beta}_{[g]}, \sigma^2_{[g]}I \right)$$
 
-```{r limma, echo = FALSE, fig.cap=limma_fig_caption, out.width = '75%'}
-knitr::include_graphics(limma_fig)
-```
 
 ---
 
@@ -375,17 +382,35 @@ rbind(
 )
 ```
 
-"voom: Precision _weights_ unlock linear model analysis tools for RNA-seq read counts." Law et al (Genome Biol. 2014)
+--
 
-```{r, echo = TRUE}
+"voom: Precision **weights** unlock linear model analysis tools for RNA-seq read counts." Law et al (Genome Biol. 2014)
+
+
+```{r, echo = TRUE, tidy = FALSE}
 with(
   dge_voom[row_carm1, ],
-  lm.wfit(
-    x = design, y = as.vector(E), w = as.vector(weights)
-  )
+    lm.wfit(x = design, y = as.vector(E), w = as.vector(weights)) #<<
 )$coefficients %*% contrasts
 ```
 
+---
+
+## `limma` does other stuff ...
+
+```{r, echo = FALSE}
+limma_fig <- here(
+  "figures",
+  "gkv007fig1.jpg"
+)
+
+limma_fig_caption <- "Source: Richie et al. Nuc. Acids Res. (2015)"
+```
+
+
+```{r limma, echo = FALSE, fig.cap=limma_fig_caption, out.width = '75%'}
+knitr::include_graphics(limma_fig)
+```
 ---
 
 ## Some Univariate Distibutions
@@ -406,7 +431,102 @@ knitr::include_graphics(url)
 
 ---
 
-## The 'count all the things' approach: `edgeR` / `DESeq2`
+## The 'why should the residuals be Normal?' generalisation: (`edgeR` / `DESeq2`)
+
+$$\mathbf{y} \sim \mathcal{N} \left(X\boldsymbol{\beta}, \sigma^2I \right)$$
+
+that is, for the $i$th observation:
+
+$$y_i \sim \mathcal{N} \left(\Sigma_j X_{ij}\beta_j, \sigma^2 \right)$$
+
+$$\downarrow$$
+
+$$y_i \sim \mathcal{\psi} \left(\Sigma_j X_{ij}\beta_j,\ other\ params \right)$$
+
+eg, [generalised linear models](
+  https://newonlinecourses.science.psu.edu/stat504/node/216/
+)
+
+---
+
+## RNA-Seq counts are _counts_
+
+Count distributions (examples)
+
+- {0, 1} Bernoulli
+- {0, 1, 2, ..., n} Binomial
+- {0, 1, 2, ..., Inf} Poisson, Geometric
+
+--
+
+Negative-Binomial $\mathcal{NB} \left( r, p \right)$
+- used in both `edgeR` and `DESeq2`
+- generalisation of
+    - Poisson
+    - Geometric
+- practically: just more flexible than Poisson
+
+---
+
+## The `edgeR` model
+
+For a gene $g$ and sample $i$
+
+$$y_i \sim \mathcal{NB}\left( mean = M_i p_j,\ dispersion = \phi \right)$$
+
+where
+
+- $y_i$ is the observed count
+
+- $M_i$ is the library size
+
+- $p_j$ is the relative abundance of $g$ in the experimental group $j$
+
+
+
+Note, $\phi = 0$ is a Poisson model
+
+---
+
+## NB = Gamma-Poisson Mixture
+
+To sample 1000 NB(r, p) values
+- sample 1000 Gamma(shape = r, scale = p/(1-p)) values
+- then for each Gamma value, g, sample a Poisson(rate = g)
+- The latter are NB(r, p) // but R uses 1 - p rather than p
+
+```{r}
+set.seed(1)
+r <- 4
+p <- 0.25
+```
+
+```{r}
+n <- 1000
+lambdas <- rgamma(n = n, shape = r, scale = p / (1 - p))
+nb_samples <- rpois(n = n, lambda = lambdas)
+```
+
+```{r, fig.height = height.5}
+# https://mikelove.wordpress.com/2011/03/30/r-one-liner-histogram-for-integers/
+int.hist = function(x, ylab="Density", ...) {
+  barplot(
+    table(factor(x, levels = min(x) : max(x))) / length(x),
+    space = 0,
+    xaxt = "n",
+    ylab = ylab,
+    ...
+  )
+  axis(1)
+}
+
+par(mfrow = c(1, 2))
+hist(lambdas, probability = TRUE, col = "grey", xlab = "lambda")
+lines(seq(0, 5, 0.01), dgamma(seq(0, 5, 0.01), shape = r, scale = p / (1 - p)))
+
+int.hist(nb_samples, main = "Histogram of NB(r, p)")
+points(0.5 + 0:7, dnbinom(0:7, size = r, prob = 1 - p))
+```
 
 ---
 
@@ -437,6 +557,14 @@ knitr::include_graphics(url)
 - dynamic modelling of gene expression ...
 
 - the cell population milkshake ...
+
+<!--
+  TODO: further reading
+  - Extending the linear model
+  - Introduction to Generalized Linear Models
+  - Statistical Rethinking
+-->
+
 
 <!-- TODO: Generalisation:
     - Multiple 'y'
