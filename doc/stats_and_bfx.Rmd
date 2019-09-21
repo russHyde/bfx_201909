@@ -4,16 +4,19 @@ subtitle: "Statistical connections within the bioinformatics toolkit"
 author: "Russ Hyde"
 date: "30th September, 2019"
 output:
-  xaringan::moon_reader
+  xaringan::moon_reader:
+    nature:
+      highlightLines: true
 ---
 
 ```{r setup, include=FALSE}
+library(here)
 knitr::opts_chunk$set(echo = FALSE)
+
 height.5 = 4
 height.75 = 6
 height.max = 8
 set.seed(3)
-library(here)
 ```
 
 ```{r}
@@ -202,7 +205,16 @@ See also: ExploreModelMatrix
 
 ---
 
-## The 'transform to _normality_' approach: `lm()`
+## The implicit generalisation: transform the outcome (`lm()`)
+
+If the residuals aren't normal(ish) in
+
+$$\mathbf{y} \sim \mathcal{N} \left(X\boldsymbol{\beta}, \sigma^2I \right)$$
+$$\downarrow$$
+$$\mathbf{Y} = f(\mathbf{y})$$
+$$\mathbf{Y} \sim \mathcal{N} \left(X\boldsymbol{\beta}, \sigma^2I \right)$$
+
+---
 
 ```{r, echo = TRUE}
 design <- factor_model(~ cell + treatment, data = dge$samples)
@@ -315,20 +327,15 @@ LHS `skno1` != RHS `skno1` coef
 
 ---
 
-## The 'borrow information' approach: `limma`
+## The 'borrow information' generalisation (`limma`)
 
-```{r, echo = FALSE}
-limma_fig <- here(
-  "figures",
-  "gkv007fig1.jpg"
-)
+$$\mathbf{y}_{[g_1]} \sim \mathcal{N} \left(X\boldsymbol{\beta}_{[g_1]}, \sigma^2_{[g_1]}I \right)$$
+$$\mathbf{y}_{[g_2]} \sim \mathcal{N} \left(X\boldsymbol{\beta}_{[g_2]}, \sigma^2_{[g_2]}I \right)$$
+$$\downarrow$$
 
-limma_fig_caption <- "Source: Richie et al. Nuc. Acids Res. (2015)"
-```
+$$\sigma_{g} : {balance\ between\ gene-specific\ estimate\ and\ global\ estimate}$$
+$$\mathbf{y}_{[g]} \sim \mathcal{N} \left(X\boldsymbol{\beta}_{[g]}, \sigma^2_{[g]}I \right)$$
 
-```{r limma, echo = FALSE, fig.cap=limma_fig_caption, out.width = '75%'}
-knitr::include_graphics(limma_fig)
-```
 
 ---
 
@@ -375,17 +382,35 @@ rbind(
 )
 ```
 
-"voom: Precision _weights_ unlock linear model analysis tools for RNA-seq read counts." Law et al (Genome Biol. 2014)
+--
 
-```{r, echo = TRUE}
+"voom: Precision **weights** unlock linear model analysis tools for RNA-seq read counts." Law et al (Genome Biol. 2014)
+
+
+```{r, echo = TRUE, tidy = FALSE}
 with(
   dge_voom[row_carm1, ],
-  lm.wfit(
-    x = design, y = as.vector(E), w = as.vector(weights)
-  )
+    lm.wfit(x = design, y = as.vector(E), w = as.vector(weights)) #<<
 )$coefficients %*% contrasts
 ```
 
+---
+
+## `limma` does other stuff ...
+
+```{r, echo = FALSE}
+limma_fig <- here(
+  "figures",
+  "gkv007fig1.jpg"
+)
+
+limma_fig_caption <- "Source: Richie et al. Nuc. Acids Res. (2015)"
+```
+
+
+```{r limma, echo = FALSE, fig.cap=limma_fig_caption, out.width = '75%'}
+knitr::include_graphics(limma_fig)
+```
 ---
 
 ## Some Univariate Distibutions
@@ -406,7 +431,126 @@ knitr::include_graphics(url)
 
 ---
 
-## The 'count all the things' approach: `edgeR` / `DESeq2`
+## The 'why should the residuals be Normal?' generalisation: (`edgeR` / `DESeq2`)
+
+$$\mathbf{y} \sim \mathcal{N} \left(X\boldsymbol{\beta}, \sigma^2I \right)$$
+
+that is, for the $i$th observation:
+
+$$y_i \sim \mathcal{N} \left(\Sigma_j X_{ij}\beta_j, \sigma^2 \right)$$
+
+$$\downarrow$$
+
+$$y_i \sim \mathcal{\psi} \left(\Sigma_j X_{ij}\beta_j,\ other\ params \right)$$
+
+eg, [generalised linear models](
+  https://newonlinecourses.science.psu.edu/stat504/node/216/
+)
+
+---
+
+## RNA-Seq counts are _counts_
+
+Count distributions (examples)
+
+- {0, 1} Bernoulli
+- {0, 1, 2, ..., n} Binomial
+- {0, 1, 2, ..., Inf} Poisson, Geometric
+
+--
+
+Negative-Binomial $\mathcal{NB} \left( r, q \right)$
+
+- used in both `edgeR` and `DESeq2`
+
+- generalisation of
+    - Poisson
+    - Geometric
+
+- practically: just more flexible than Poisson
+
+- many ways of parameterising:
+    - r = size, q = prob of success
+    - m = mean = $r(1-q)/q$ , v = variance = $r(1-q)/q^2$
+
+---
+
+## The `edgeR` model
+
+For a gene $g$ and sample $i$ (from experimental group $k$)
+
+$$y_i \sim \mathcal{NB}\left( mean = m_i, var = v_i \right)$$
+
+where
+
+- $m_i = M_i p_k$
+
+    - $M_i$ = library size
+
+    - $p_k$ = relative abundance of $g$ in experimental group $k$
+
+- $v_i = m_i\left( 1 + m_i \phi \right)$
+
+- $p_k = \exp\left( \Sigma_j {X_{ij}\beta_j} \right)$
+
+- $y_i$ is the observed count
+
+- `edgeR` call $\phi$ the dispersion parameter (note, $\phi = 0$ is a Poisson
+model; note $\phi ^ {1/2} = BCV$)
+
+---
+
+```{r, echo = TRUE}
+dge_edger <- edgeR::estimateDisp(dge, design = design, tagwise = TRUE)
+
+fit_edger <- edgeR::glmFit(dge_edger, design = design)
+```
+
+```{r, echo = TRUE}
+# convert coefs to log2
+fit_edger$coefficients[row_carm1, ] * log2(exp(1))
+```
+
+```{r}
+rbind(
+  lm_carm1$coefficients %*% contrasts,
+  fit_ebayes$coefficients[row_carm1, ],
+ (fit_edger$coefficients[row_carm1, ] * log2(exp(1))) %*% contrasts
+) %>% set_rownames(
+  c("`lm()`", "`limma::eBayes`", "`edgeR::glmFit`")
+)
+```
+
+---
+
+To get (approx) the same coefficients as `edgeR` using `glm`
+
+```{r, echo = TRUE}
+model_data <- with(
+  dge_edger,
+  data.frame(
+    counts = as.vector(counts[row_carm1, ]),
+    samples
+))
+
+nb <- glm(
+  # note that the `offset()` introduces a fixed constant (it's included in the
+  # model with a coefficient of 1)
+  counts ~ offset(log(lib.size)) + cell + treatment,
+  data = model_data,
+  family = MASS::negative.binomial(
+    # R/MASS uses theta = 1 / phi, where phi is `edgeR`'s dispersion parameter
+    # note that v = mu + mu^2/theta = mu + phi * mu^2
+    theta = 1 / dge_edger$tagwise.dispersion[row_carm1]
+  )
+)
+
+nb$coefficients * log2(exp(1))
+(nb$coefficients * log2(exp(1))) %*% contrasts
+```
+
+
+
 
 ---
 
@@ -438,6 +582,14 @@ knitr::include_graphics(url)
 
 - the cell population milkshake ...
 
+<!--
+  TODO: further reading
+  - Extending the linear model
+  - Introduction to Generalized Linear Models
+  - Statistical Rethinking
+-->
+
+
 <!-- TODO: Generalisation:
     - Multiple 'y'
       - repeated measures
@@ -445,6 +597,10 @@ knitr::include_graphics(url)
     - _N_ -> ARBITRARY_DIST(params)
     - Fixed effects -> Mixed effects: modification of X
 -->
+
+---
+
+# Appendix
 
 <!--
 
@@ -483,3 +639,157 @@ Model:
 <!--
   There is _no_ one simplest model
 -->
+
+---
+
+## NB = Gamma-Poisson Mixture
+
+To sample 1000 NB(r, p) values
+- sample 1000 Gamma(shape = r, scale = p/(1-p)) values
+- then for each Gamma value, g, sample a Poisson(rate = g)
+- The latter are NB(r, p) // but R uses 1 - p rather than p
+
+```{r}
+set.seed(1)
+r <- 4
+p <- 0.25
+```
+
+```{r}
+n <- 1000
+lambdas <- rgamma(n = n, shape = r, scale = p / (1 - p))
+nb_samples <- rpois(n = n, lambda = lambdas)
+```
+
+```{r, fig.height = height.5}
+# https://mikelove.wordpress.com/2011/03/30/r-one-liner-histogram-for-integers/
+int.hist = function(x, ylab="Density", ...) {
+  barplot(
+    table(factor(x, levels = min(x) : max(x))) / length(x),
+    space = 0,
+    xaxt = "n",
+    ylab = ylab,
+    ...
+  )
+  axis(1)
+}
+
+par(mfrow = c(1, 2))
+hist(lambdas, probability = TRUE, col = "grey", xlab = "lambda")
+lines(seq(0, 5, 0.01), dgamma(seq(0, 5, 0.01), shape = r, scale = p / (1 - p)))
+
+int.hist(nb_samples, main = "Histogram of NB(r, p)")
+points(0.5 + 0:7, dnbinom(0:7, size = r, prob = 1 - p))
+```
+
+---
+
+## `edgeR` fits larger coefficients for poorly-detected genes than `limma`
+
+```{r, fig.height = height.75}
+data.frame(
+  limma = fit_ebayes$coefficients[, "sh_55"],
+  edger = (fit_edger$coefficients * log2(exp(1))) %*% contrasts[, "sh_55"],
+  log_cpm = aveLogCPM(dge_edger)
+) %>%
+  mutate(
+    cpm_group = cut(log_cpm,
+                    breaks = quantile(log_cpm, probs = seq(0, 1, 1/3)),
+                    include.lowest = TRUE)
+  ) %>%
+ggplot(
+  aes(x = limma, y = edger)
+  ) +
+  facet_wrap(~ cpm_group) +
+  geom_point(alpha = 1 / 10) +
+  scale_fill_continuous(type = "viridis") +
+  lims(x = c(-5, 5), y = c(-5, 5))
+```
+
+---
+
+# Using `stan` to fit a negative binomial model for RNA-Seq
+
+```{r, echo = TRUE}
+suppressPackageStartupMessages(
+  library(rstan)
+)
+```
+
+---
+
+## stan (cont.)
+
+```{r, echo = TRUE}
+# modified from http://rstudio-pubs-static.s3.amazonaws.com/34099_2e35c3966ef548c2918d5b6c2146bfd1.html
+
+model <- "
+// negative binomial parameterized as eta (log(mu)) and dispersion (phi)
+// see p286 in stan-reference-2.4.0.pdf
+// a basic GLM example
+data {
+  int<lower=1> N;    // rows of data
+  matrix[N, 5] X;    // predictor
+  vector[N] L;       // lib sizes
+  int<lower=0> y[N]; // response
+  real phi;          // edgeR dispersion parameter (glm() and stan use the
+                     //   inverse of this to specify mean/variance relationship;
+                     //   we call the inverse `theta` for consistency with glm())
+                     // Apologies for the confusion, stan's docs refer to our
+                     //   `theta` as `phi`
+}
+parameters {
+  vector[5] beta; // coefficients for the linear component
+}
+transformed parameters {
+  vector[N] y_hat = L .* exp(X * beta); // linear component
+  real theta = 1 / phi;
+}
+model {
+  // data model:
+  y ~ neg_binomial_2(y_hat, theta);
+}
+"
+```
+
+---
+
+## stan (cont.)
+
+```{r, echo = TRUE}
+stan_data <- list(
+  N = ncol(dge_edger),
+  y = as.vector(dge_edger$counts[row_carm1, ]),
+  L = as.vector(dge_edger$samples$lib.size),
+  X = set_colnames(design, c("intercept", colnames(design)[-1])),
+  phi = dge_edger$tagwise.dispersion[row_carm1]
+)
+```
+
+```{r, echo = TRUE}
+write(model, file = here("models/negbin-glm.stan"))
+```
+
+```{r, echo = TRUE}
+sm <- stan_model(here("models/negbin-glm.stan"))
+```
+
+---
+
+## stan (cont.)
+
+```{r, message = FALSE, warning = FALSE, echo = TRUE}
+# refresh = 0 prevents sampling output from printing
+m <- sampling(sm, data = stan_data,
+  pars = c("beta"),
+  iter = 2000, chains = 4, verbose = FALSE, refresh = 0)
+```
+
+```{r, echo = TRUE}
+log2(exp(1)) *
+  rbind(
+    edgeR = fit_edger$coefficients[row_carm1, ],
+    glm = nb$coefficients,
+    stan = summary(m, "beta")$summary[, "mean"]
+) %*% contrasts
+```
