@@ -188,6 +188,7 @@ https://conda.anaconda.org/conda-forge/noarch/r-brew-1.0_6-r35h6115d3f_1002.tar.
 https://conda.anaconda.org/conda-forge/noarch/r-clipr-0.7.0-r35h6115d3f_0.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/r-clisymbols-1.2.0-r35h6115d3f_1002.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-cluster-2.1.0-r35h9bbef5b_2.tar.bz2
+https://conda.anaconda.org/conda-forge/noarch/r-codetools-0.2_16-r35h6115d3f_1001.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-colorspace-1.4_1-r35hcdcec82_1.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-commonmark-1.7-r35hcdcec82_1001.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/r-crayon-1.3.4-r35h6115d3f_1002.tar.bz2
@@ -207,6 +208,7 @@ https://conda.anaconda.org/conda-forge/linux-64/r-glue-1.3.1-r35hcdcec82_1.tar.b
 https://conda.anaconda.org/conda-forge/noarch/r-gtable-0.3.0-r35h6115d3f_2.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/r-highr-0.8-r35h6115d3f_1.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/r-ini-0.3.1-r35h6115d3f_1002.tar.bz2
+https://conda.anaconda.org/conda-forge/noarch/r-inline-0.3.15-r35h6115d3f_1001.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-jsonlite-1.6-r35hcdcec82_1001.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/r-labeling-0.3-r35h6115d3f_1002.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-lattice-0.20_38-r35hcdcec82_1002.tar.bz2
@@ -236,6 +238,7 @@ https://conda.anaconda.org/conda-forge/noarch/r-rstudioapi-0.10-r35h6115d3f_1.ta
 https://conda.anaconda.org/conda-forge/noarch/r-shape-1.4.4-r35_1002.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/r-snow-0.4_3-r35h6115d3f_1001.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-sourcetools-0.1.7-r35he1b5a44_1001.tar.bz2
+https://conda.anaconda.org/conda-forge/linux-64/r-stanheaders-2.19.0-r35h6786f55_0.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-stringi-1.4.3-r35h0357c0b_2.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-sys-3.2-r35hcdcec82_1.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-utf8-1.1.4-r35hcdcec82_1001.tar.bz2
@@ -255,6 +258,7 @@ https://conda.anaconda.org/conda-forge/noarch/r-argparse-2.0.1-r35h6115d3f_1.tar
 https://conda.anaconda.org/conda-forge/linux-64/r-askpass-1.1-r35hcdcec82_1.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-bit64-0.9_7-r35hcdcec82_1001.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-catools-1.17.1.2-r35h0357c0b_1.tar.bz2
+https://conda.anaconda.org/conda-forge/linux-64/r-checkmate-1.9.4-r35hcdcec82_1.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/r-circlize-0.4.8-r35h6115d3f_0.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/r-cli-1.1.0-r35h6115d3f_1.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-clue-0.3_57-r35h516909a_1.tar.bz2
@@ -263,6 +267,7 @@ https://conda.anaconda.org/conda-forge/linux-64/r-ellipsis-0.2.0.1-r35hcdcec82_1
 https://conda.anaconda.org/conda-forge/noarch/r-forge-0.2.0-r35h6115d3f_1.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-fs-1.3.1-r35h0357c0b_1.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/r-getoptlong-0.1.7-r35_1002.tar.bz2
+https://conda.anaconda.org/conda-forge/noarch/r-gridextra-2.3-r35h6115d3f_1002.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-htmltools-0.3.6-r35he1b5a44_1003.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/r-httr-1.4.1-r35h6115d3f_0.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/r-lambda.r-1.2.3-r35h6115d3f_1001.tar.bz2
@@ -299,8 +304,10 @@ https://conda.anaconda.org/conda-forge/noarch/r-gh-1.0.1-r35h6115d3f_1002.tar.bz
 https://conda.anaconda.org/conda-forge/noarch/r-here-0.1-r35h6115d3f_1002.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/r-htmlwidgets-1.3-r35h6115d3f_1001.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/r-knitr-1.24-r35h6115d3f_0.tar.bz2
+https://conda.anaconda.org/conda-forge/noarch/r-loo-2.1.0-r35h6115d3f_1.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-mgcv-1.8_28-r35hcdcec82_1.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-promises-1.0.1-r35h0357c0b_1001.tar.bz2
+https://conda.anaconda.org/conda-forge/linux-64/r-rcppeigen-0.3.3.5.0-r35h0357c0b_1.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-reshape2-1.4.3-r35h0357c0b_1004.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-scales-1.0.0-r35h0357c0b_1002.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/r-sessioninfo-1.1.1-r35h6115d3f_1001.tar.bz2
@@ -352,6 +359,7 @@ https://conda.anaconda.org/bioconda/linux-64/bioconductor-genomicalignments-1.18
 https://conda.anaconda.org/conda-forge/noarch/r-dbplyr-1.4.2-r35h6115d3f_1.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-haven-2.1.1-r35h0357c0b_1.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-readxl-1.3.1-r35h0357c0b_1.tar.bz2
+https://conda.anaconda.org/conda-forge/linux-64/r-rstan-2.19.2-r35h0357c0b_1.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/r-styler-1.1.1-r35h6115d3f_1.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-64/r-tidyr-0.8.3-r35h0357c0b_1.tar.bz2
 https://conda.anaconda.org/bioconda/linux-64/bioconductor-rtracklayer-1.42.1-r351h14c3975_0.tar.bz2

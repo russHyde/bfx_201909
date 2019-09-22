@@ -33,3 +33,6 @@
 ./results
 ./scripts/snake_recipes
 ./temp
+
+
+./models

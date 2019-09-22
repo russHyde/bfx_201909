@@ -185,12 +185,14 @@ dependencies:
   - r-callr=3.3.1
   - r-catools=1.17.1.2
   - r-cellranger=1.1.0
+  - r-checkmate=1.9.4
   - r-circlize=0.4.8
   - r-cli=1.1.0
   - r-clipr=0.7.0
   - r-clisymbols=1.2.0
   - r-clue=0.3_57
   - r-cluster=2.1.0
+  - r-codetools=0.2_16
   - r-colorspace=1.4_1
   - r-commonmark=1.7
   - r-config=0.3
@@ -220,6 +222,7 @@ dependencies:
   - r-git2r=0.24.0
   - r-globaloptions=0.1.0
   - r-glue=1.3.1
+  - r-gridextra=2.3
   - r-gtable=0.3.0
   - r-haven=2.1.1
   - r-here=0.1
@@ -230,6 +233,7 @@ dependencies:
   - r-httpuv=1.5.1
   - r-httr=1.4.1
   - r-ini=0.3.1
+  - r-inline=0.3.15
   - r-jsonlite=1.6
   - r-knitr=1.24
   - r-labeling=0.3
@@ -238,6 +242,7 @@ dependencies:
   - r-lattice=0.20_38
   - r-lazyeval=0.2.2
   - r-locfit=1.5_9.1
+  - r-loo=2.1.0
   - r-magrittr=1.5
   - r-markdown=1.1
   - r-mass=7.3_51.4
@@ -275,6 +280,7 @@ dependencies:
   - r-rcmdcheck=1.3.3
   - r-rcolorbrewer=1.1_2
   - r-rcpp=1.0.2
+  - r-rcppeigen=0.3.3.5.0
   - r-rcurl=1.95_4.12
   - r-readr=1.3.1
   - r-readxl=1.3.1
@@ -291,6 +297,7 @@ dependencies:
   - r-roxygen2=6.1.1
   - r-rprojroot=1.3_2
   - r-rsconnect=0.8.15
+  - r-rstan=2.19.2
   - r-rstudioapi=0.10
   - r-scales=1.0.0
   - r-servr=0.15
@@ -300,6 +307,7 @@ dependencies:
   - r-snow=0.4_3
   - r-sourcetools=0.1.7
   - r-sparklyr=1.0.2
+  - r-stanheaders=2.19.0
   - r-stringi=1.4.3
   - r-stringr=1.4.0
   - r-styler=1.1.1
@@ -362,5 +370,5 @@ dependencies:
   - yarl=1.2.6
   - zlib=1.2.11
   - zstd=1.4.0
-prefix: /home/ah327h/tools/miniconda3/envs/bfx_201909
+prefix: /root/tools/miniconda3/envs/bfx_201909
 
