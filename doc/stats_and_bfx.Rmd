@@ -74,7 +74,7 @@ pkgs <- c(
   # CRAN
   "dplyr", "magrittr", "ggplot2",
   # Bioconductor
-  "ComplexHeatmap", "edgeR", "limma"
+  "ComplexHeatmap", "edgeR", "limma", "variancePartition"
 )
 
 for (pkg in pkgs) {
@@ -532,7 +532,9 @@ model_data <- with(
     counts = as.vector(counts[row_carm1, ]),
     samples
 ))
+```
 
+```{r, echo = TRUE}
 nb <- glm(
   # note that the `offset()` introduces a fixed constant (it's included in the
   # model with a coefficient of 1)
@@ -544,33 +546,155 @@ nb <- glm(
     theta = 1 / dge_edger$tagwise.dispersion[row_carm1]
   )
 )
+```
 
+---
+
+```{r, echo = TRUE}
 nb$coefficients * log2(exp(1))
 (nb$coefficients * log2(exp(1))) %*% contrasts
 ```
 
+---
 
+## The 'why should all the effects be _fixed_?' generalisation: (`lme4`, `variancePartition`)
 
+$$\mathbf{y} \sim X\boldsymbol{\beta} + \mathcal{N} \left(\boldsymbol{0}, \sigma^2I \right)$$
+that is,
+
+$$\mathbf{y} \sim {Fixed\ Effects} + Noise$$
+$$\downarrow$$
+$$\mathbf{y} \sim [Fixed Effects] + [Random Effects] + Noise$$
 
 ---
 
-## The Statistical Philosophies
+Sources of variability in the current experiment:
+
+- Cell type
+
+- Batch (not modelled here)
+
+- Treatment
+
+- Technical issues, noise etc
+
+Fixed effect:
+
+- Unknown _constant_ we are trying to estimate
 
 ---
 
-## The 'batch-effects are random variables' approach (`lme4`)
+## Why are we estimating the baseline difference between cell types?
 
-<!-- Voom with duplicate correlation -->
+```{r, fig.height = height.5}
+design_heatmap(design) +
+  rowAnnotation(
+    df = dge$samples[, c("cell", "batch", "treatment")]
+  )
+```
 
-<!-- variancePartition::dream() -->
+Random effect:
+
+- A model parameter that is a random variable
+
+- You estimate the properties of its distribution, not its _value_
 
 ---
 
-## The 'everything is a random variable' approach (`stan` / `jags`)
+## Mixed Model version
+
+```{r}
+treatment_design <- model.matrix(~ treatment, data = dge$samples)
+cell_design <- model.matrix(~ -1 + cell, data = dge$samples)
+
+design_heatmap(
+  treatment_design, show_heatmap_legend = FALSE, column_title = "Fixed effects"
+) +
+  rowAnnotation(foo = anno_empty(border = FALSE,
+    width = max_text_width("X beta + ") + unit(4, "mm"))
+  ) +
+  design_heatmap(
+    cell_design, show_row_names = FALSE, show_heatmap_legend = FALSE, column_title = "Random effects"
+  ) +
+  rowAnnotation(bar = anno_empty(border = FALSE,
+    width = max_text_width("X gamma + Noise") + unit(4, "mm"))
+  )
+decorate_annotation("foo", grid.text("X beta +"))
+decorate_annotation("bar", grid.text("X gamma + Noise"))
+```
 
 ---
 
-## The 'beyond the scope of the talk, and of my explanatory powers' approaches ...
+## `voom::duplicateCorrelation`
+
+```{r, echo = TRUE, message = FALSE}
+# limma can accomodate at most one random effect
+treatment_design <- model.matrix(
+  ~ -1 + treatment, data = dge_voom$targets
+)
+treatment_contrast <- makeContrasts(
+  sh55 = "treatmentsh55 - treatmentshct",
+  sh57 = "treatmentsh57 - treatmentshct",
+  levels = treatment_design
+)
+# 'random effects' as used in limma
+blocks <- factor(dge_voom$targets$cell)
+```
+
+---
+
+## `duplicateCorrelation (cont.)`
+
+```{r, echo = TRUE}
+dupcor <- limma::duplicateCorrelation(
+  dge_voom, treatment_design, block = blocks)
+
+fit_cor <- lmFit(
+  dge_voom, treatment_design,
+  block = blocks, correlation = dupcor$consensus #<<
+)
+fit_cor$coefficients[row_carm1, ] %*% treatment_contrast
+```
+
+---
+
+## `variancePartition`
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE, error = FALSE}
+vp <- variancePartition::dream(
+  dge_voom[row_carm1, ], # slow for all genes; recommend parallel
+  formula = ~ -1 + treatment + (1|cell), # lme4 model syntax #<<
+  data = dge_voom$targets,
+  L = treatment_contrast
+)
+```
+
+```{r, echo = TRUE}
+vp$coefficients
+```
+
+---
+
+## Multiple random effects in `variancePartition::dream`
+
+```{r, echo = TRUE, message = FALSE}
+vp2 <- variancePartition::dream(
+  dge_voom[row_carm1, ],
+  formula = ~ -1 + treatment + (1|cell) + (1|batch), #<<
+  data = dge_voom$targets,
+  L = treatment_contrast
+)
+```
+
+```{r, echo = TRUE}
+vp2$coefficients
+```
+
+---
+
+## The 'beyond the scope of the talk, and of my explanatory powers' generalisations ...
+
+- fully Bayesian approaches (STAN etc)
 
 - genes aren't independent of each other ...
 
@@ -582,21 +706,19 @@ nb$coefficients * log2(exp(1))
 
 - the cell population milkshake ...
 
-<!--
-  TODO: further reading
-  - Extending the linear model
-  - Introduction to Generalized Linear Models
-  - Statistical Rethinking
--->
+---
 
+## Further Reading
 
-<!-- TODO: Generalisation:
-    - Multiple 'y'
-      - repeated measures
-      - different genes
-    - _N_ -> ARBITRARY_DIST(params)
-    - Fixed effects -> Mixed effects: modification of X
--->
+Connections between different models
+
+- Faraway - [Extending the linear model with R](https://people.bath.ac.uk/jjf23/ELM/)
+- Dobson & Barnett - [An Introduction to Generalized Linear Models](
+  https://www.crcpress.com/An-Introduction-to-Generalized-Linear-Models/Dobson-Barnett/p/book/9781138741515)
+
+Bayesian stats (beyond the main part of this talk)
+
+- McElreath - [Statistical Rethinking](https://xcelab.net/rm/statistical-rethinking/)
 
 ---
 
@@ -793,3 +915,9 @@ log2(exp(1)) *
     stan = summary(m, "beta")$summary[, "mean"]
 ) %*% contrasts
 ```
+
+<!--
+
+## The Statistical Philosophies
+
+-->
