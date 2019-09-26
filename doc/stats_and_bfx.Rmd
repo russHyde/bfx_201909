@@ -809,6 +809,27 @@ Model:
 
 ---
 
+## Was the model appropriate?
+
+```{r, echo = FALSE}
+par(mfrow = c(1, 2))
+residuals <- dge_voom$E - (fit_raw$coefficients %*% t(design))
+limma::plotMDS(
+  residuals,
+  labels = dge_voom$targets$cell,
+  col = c("red", "green", "blue")[factor(dge_voom$targets$cell)]
+)
+limma::plotMDS(
+  residuals,
+  labels = dge_voom$targets$batch,
+  col = c("red", "green", "blue")[factor(dge_voom$targets$batch)]
+)
+```
+
+[Could have included batch-effect and cell/treatment interaction]
+
+---
+
 ## NB = Gamma-Poisson Mixture
 
 To sample 1000 NB(r, p) values
