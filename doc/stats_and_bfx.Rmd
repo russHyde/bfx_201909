@@ -7,7 +7,18 @@ output:
   xaringan::moon_reader:
     nature:
       highlightLines: true
+      countdown: 120000
 ---
+
+```{r setup, include=FALSE}
+library(here)
+knitr::opts_chunk$set(echo = FALSE)
+
+height.5 = 4
+height.75 = 6
+height.max = 8
+set.seed(3)
+```
 
 ```{css}
 pre code, pre, code {
@@ -18,16 +29,6 @@ pre code, pre, code {
   word-break: keep-all !important;
   word-wrap: initial !important;
 }
-```
-
-```{r setup, include=FALSE}
-library(here)
-knitr::opts_chunk$set(echo = FALSE)
-
-height.5 = 4
-height.75 = 6
-height.max = 8
-set.seed(3)
 ```
 
 ```{r}
