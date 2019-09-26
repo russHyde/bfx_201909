@@ -213,6 +213,26 @@ See also: ExploreModelMatrix
 
 ---
 
+## Contrast Matrices
+
+Encode the experimental comparisons
+
+Dependent on Design Matrix
+
+Columns: Comparison of interest
+
+Rows: Model coefficients (~ columns of design matrix)
+
+Treatment Y vs Treatment X:
+    - A) What combination of model coefficients gives the 'fitted value' for X
+    - B) ... for Y
+    - Subtract A from B
+
+Be careful with contrasts over 'interactions'
+- [genomicsclass.github.io/book/pages/interactions_and_contrasts.html]()
+
+---
+
 ## The implicit generalisation: transform the outcome (`lm()`)
 
 If the residuals aren't normal(ish) in
