@@ -9,6 +9,17 @@ output:
       highlightLines: true
 ---
 
+```{css}
+pre code, pre, code {
+  max-height: 480px;
+  white-space: pre !important;
+  overflow-x: scroll !important;
+  overflow-y: scroll !important;
+  word-break: keep-all !important;
+  word-wrap: initial !important;
+}
+```
+
 ```{r setup, include=FALSE}
 library(here)
 knitr::opts_chunk$set(echo = FALSE)
