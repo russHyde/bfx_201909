@@ -112,6 +112,14 @@ dge <- dge[dge$genes$gene_biotype == "protein_coding", ]
 dim(dge)
 ```
 
+```{r}
+# not shown: recode the dataset so that sh-Control is the reference group for
+# each cell line
+dge$samples$treatment <- factor(
+  dge$samples$treatment, levels = c("shct", "sh55", "sh57")
+)
+```
+
 .pull-left[
 
 ```{r density, eval = FALSE, echo = TRUE}
@@ -205,6 +213,26 @@ See also: ExploreModelMatrix
 
 ---
 
+## Contrast Matrices
+
+Encode the experimental comparisons
+
+Dependent on Design Matrix
+
+Columns: Comparison of interest
+
+Rows: Model coefficients (~ columns of design matrix)
+
+Treatment Y vs Treatment X:
+    - A) What combination of model coefficients gives the 'fitted value' for X
+    - B) ... for Y
+    - Subtract A from B
+
+Be careful with contrasts over 'interactions'
+- [genomicsclass.github.io/book/pages/interactions_and_contrasts.html]()
+
+---
+
 ## The implicit generalisation: transform the outcome (`lm()`)
 
 If the residuals aren't normal(ish) in
@@ -252,18 +280,18 @@ lm_carm1 <- lm(intensity ~ cell + treatment, data = df_carm1)
 lm_carm1
 ```
 
-Baselines (for cell: MOLM13; for treatment: sh55)
+Baselines (for cell: MOLM13; for treatment: shct)
 
 Fitted values:
 
-- [SKNO1, shControl]:
+- [SKNO1, sh57]:
 
-    - (Intercept) + cellskno1 + treatmentsshct
+    - (Intercept) + cellskno1 + treatmentssh57
 
 ```{r, echo = TRUE}
 with(
   lm_carm1,
-  sum(coefficients[c("(Intercept)", "cellskno1", "treatmentshct")]))
+  sum(coefficients[c("(Intercept)", "cellskno1", "treatmentsh57")]))
 ```
 
 ---
@@ -278,7 +306,35 @@ What is the matrix * vector product?
 (
   design %*% lm_carm1$coefficients
   ) %>%
-  tail(n = 12)
+  tail(n = 6)
+```
+
+---
+
+## Fitted- versus Observed-Values
+
+```{r}
+replace_duplicates <- function(x, replacement = "") {
+  is_dup <- duplicated(x)
+  x[is_dup] <- replacement
+  x
+}
+
+plot(
+  design %*% lm_carm1$coefficients, col = "slategrey", pch = 16,
+  ylab = "Intensity", xlab = "",
+  xaxt = "n",
+  ylim = c(1, 5)
+)
+x_tick <- seq(nrow(df_carm1))
+x_tick_labels <- row.names(df_carm1) %>%
+  gsub(pattern = "_[abc]$", replacement = "", x = .) %>%
+  replace_duplicates()
+axis(side = 1, at = x_tick, labels = x_tick_labels, las = 2)
+
+points(df_carm1$intensity, col = "orangered3", pch = 4)
+
+# how best to illustrate the combination of coefficients?
 ```
 
 ---
@@ -288,7 +344,7 @@ What is the matrix * vector product?
 ```{r}
 hm1 <- design_heatmap(
   factor_model(~ cell + treatment, data = dge$samples),
-  column_title = "~ cell + treatment[baseline:sh55]",
+  column_title = "~ cell + treatment[baseline:shct]",
   name = "design_1"
 )
 ```
@@ -302,9 +358,9 @@ hm2 <- design_heatmap(
   factor_model(
     ~ -1 + cell + treatment,
     data = dplyr::mutate(
-      dge$samples, treatment = relevel(factor(treatment), "shct"))
+      dge$samples, treatment = relevel(factor(treatment), "sh55"))
     ),
-  column_title = "~ -1 + cell + treatment[baseline:shct]",
+  column_title = "~ -1 + cell + treatment[baseline:sh55]",
   name = "design_2"
 )
 ```
@@ -345,11 +401,12 @@ colnames(design)
 
 ```{r, echo = TRUE, warning = FALSE}
 contrasts <- limma::makeContrasts(
-  # baseline treatment is sh55, so (fit for sh55) - (fit for shCTRL)
-  # is (0) - (shct)
-  sh_55 = "-shct",
-  sh_57 = "sh57 - shct",
-  sh_average = "(sh57 - 2*shct) / 2",
+  # baseline treatment is shct, so
+  # (fit for sh55) - (fit for shCTRL) = (Intercept + k_sh55) - (Intercept)
+  # (fit for sh57) - (fit for shCTRL) = (Intercept + k_sh57) - (Intercept)
+  sh_55 = "sh55",
+  sh_57 = "sh57",
+  sh_average = "(sh55 + sh57) / 2",
   levels = design
 )
 ```
@@ -710,6 +767,10 @@ vp2$coefficients
 
 ## Further Reading
 
+Gene expression course (Love / Irizarry)
+
+- [genomicsclass.github.io/book]()
+
 Connections between different models
 
 - Faraway - [Extending the linear model with R](https://people.bath.ac.uk/jjf23/ELM/)
@@ -719,6 +780,10 @@ Connections between different models
 Bayesian stats (beyond the main part of this talk)
 
 - McElreath - [Statistical Rethinking](https://xcelab.net/rm/statistical-rethinking/)
+
+Design matrix explorer:
+
+- [https://csoneson.github.io/ExploreModelMatrix/]()
 
 ---
 
@@ -761,6 +826,27 @@ Model:
 <!--
   There is _no_ one simplest model
 -->
+
+---
+
+## Was the model appropriate?
+
+```{r, echo = FALSE}
+par(mfrow = c(1, 2))
+residuals <- dge_voom$E - (fit_raw$coefficients %*% t(design))
+limma::plotMDS(
+  residuals,
+  labels = dge_voom$targets$cell,
+  col = c("red", "green", "blue")[factor(dge_voom$targets$cell)]
+)
+limma::plotMDS(
+  residuals,
+  labels = dge_voom$targets$batch,
+  col = c("red", "green", "blue")[factor(dge_voom$targets$batch)]
+)
+```
+
+[Could have included batch-effect and cell/treatment interaction]
 
 ---
 
