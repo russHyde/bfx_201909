@@ -79,6 +79,8 @@ factor_model <- function(
 - We could use base R instead of limma / edgeR / DESeq2 / variancePartition
   (but thankfully don't)
 
+---
+
 ## Preamble
 
 Github:
