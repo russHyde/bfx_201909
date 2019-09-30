@@ -20,7 +20,7 @@ height.max = 8
 set.seed(3)
 ```
 
-```{css}
+```{css, echo = FALSE}
 pre code, pre, code {
   max-height: 480px;
   white-space: pre !important;
@@ -67,6 +67,17 @@ factor_model <- function(
   mm
   }
 ```
+
+## Key Points
+
+- Common structure to well-known statistical tests
+
+- The linear model is pervasive
+
+- Multiple routes to generalisation of the linear model
+
+- We could use base R instead of limma / edgeR / DESeq2 / variancePartition
+  (but thankfully don't)
 
 ## Preamble
 
@@ -465,6 +476,7 @@ with(
 
 ---
 
+
 ## `limma` does other stuff ...
 
 ```{r, echo = FALSE}
@@ -480,6 +492,20 @@ limma_fig_caption <- "Source: Richie et al. Nuc. Acids Res. (2015)"
 ```{r limma, echo = FALSE, fig.cap=limma_fig_caption, out.width = '75%'}
 knitr::include_graphics(limma_fig)
 ```
+---
+
+## Generalisations so far
+
+Why should we assume / allow
+
+- the residuals are normal?
+
+- only a single outcome vector?
+
+- that each hypothesis should be ran completely independently?
+
+- equal weighting of all samples?
+
 ---
 
 ## Some Univariate Distibutions
