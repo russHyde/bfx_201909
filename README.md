@@ -1,6 +1,12 @@
 # Presentation on statistics and bioinformatics
 
-If you've cloned this project and want to run it:
+I gave a talk on various extensions of the linear statistical model that are used in
+some bioinformatics tools for analysing RNA-Seq data on 2019-09-30 to the University
+of Glasgow bioinformatics meetup.
+
+If you want to look at the slides see ![here](http://rpubs.com/russH/533927)
+
+If you've cloned this project and want to run it locally:
 
 ```
 # --- project environment is managed by conda
@@ -25,11 +31,15 @@ conda activate bfx_201909
 # --- running the project is managed by snakemake
 # 
 # this will download all relevant data files and any images used in the presentation
-# then compile the .Rmd file to a xaringan presentation
+# then compile the .Rmd file to an ioslides presentation
 snakemake -p
 ```
 
 You can then view the presentation (`doc/stats_and_bfx.html`) in the browser
+
+When I presented this talk to the U of Glasgow bioinformatics meetup I used a xaringan presentation.
+The xaringan version of this talk is still available, but you'll need to pull out release v1.0.0
+of the repo and save it locally.
 
 ---
 
