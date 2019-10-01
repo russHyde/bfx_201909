@@ -4,10 +4,11 @@ subtitle: "Statistical connections within the bioinformatics toolkit"
 author: "Russ Hyde"
 date: "30th September, 2019"
 output:
-  xaringan::moon_reader:
-    nature:
-      highlightLines: true
-      countdown: 120000
+  ioslides_presentation
+#  xaringan::moon_reader:
+#    nature:
+#      highlightLines: true
+#      countdown: 120000
 ---
 
 ```{r setup, include=FALSE}
@@ -80,7 +81,6 @@ factor_model <- function(
 - We could use base R instead of limma / edgeR / DESeq2 / variancePartition
   (but thankfully don't)
 
----
 
 ## Preamble
 
@@ -109,7 +109,6 @@ for (pkg in pkgs) {
 }
 ```
 
----
 
 ## The Dataset
 
@@ -128,7 +127,6 @@ for (pkg in pkgs) {
         - but life's too short
         - he just `floor`ed the RSEM values)
 
----
 
 ## The Dataset (cont.)
 
@@ -163,7 +161,6 @@ dge %>%
 ```
 ]
 
----
 
 ## A Simple Class of Models (shorthand)
 
@@ -183,7 +180,6 @@ resp)
 
 ... plus lots of assumptions
 
----
 
 ## ... And In Practice
 
@@ -204,7 +200,6 @@ $\sigma$ - and how much noise is there around ...
 
 ... the fitted values
 
----
 
 ## Design Matrices
 
@@ -237,7 +232,6 @@ See also: ExploreModelMatrix
 ```
 ]
 
----
 
 ## Contrast Matrices
 
@@ -257,7 +251,6 @@ Treatment Y vs Treatment X:
 Be careful with contrasts over 'interactions'
 - [genomicsclass.github.io/book/pages/interactions_and_contrasts.html]()
 
----
 
 ## The implicit generalisation: transform the outcome (`lm()`)
 
@@ -268,7 +261,7 @@ $$\downarrow$$
 $$\mathbf{Y} = f(\mathbf{y})$$
 $$\mathbf{Y} \sim \mathcal{N} \left(X\boldsymbol{\beta}, \sigma^2I \right)$$
 
----
+##
 
 ```{r, echo = TRUE}
 design <- factor_model(~ cell + treatment, data = dge$samples)
@@ -297,7 +290,6 @@ p_carm1 <- df_carm1 %>%
 p_carm1
 ```
 
----
 
 ## `lm()` (cont.)
 
@@ -320,7 +312,8 @@ with(
   sum(coefficients[c("(Intercept)", "cellskno1", "treatmentsh57")]))
 ```
 
----
+
+##
 
 But
 - `design` is a N x K matrix (here, binary)
@@ -335,7 +328,6 @@ What is the matrix * vector product?
   tail(n = 6)
 ```
 
----
 
 ## Fitted- versus Observed-Values
 
@@ -363,7 +355,6 @@ points(df_carm1$intensity, col = "orangered3", pch = 4)
 # how best to illustrate the combination of coefficients?
 ```
 
----
 
 ## Equivalent Design Matrices
 
@@ -407,7 +398,6 @@ decorate_heatmap_body("design_2", f(7))
 
 LHS `skno1` != RHS `skno1` coef
 
----
 
 ## The 'borrow information' generalisation (`limma`)
 
@@ -418,8 +408,7 @@ $$\downarrow$$
 $$\sigma_{g} : {balance\ between\ gene-specific\ estimate\ and\ global\ estimate}$$
 $$\mathbf{y}_{[g]} \sim \mathcal{N} \left(X\boldsymbol{\beta}_{[g]}, \sigma^2_{[g]}I \right)$$
 
-
----
+##
 
 ```{r, echo = TRUE, warning = FALSE}
 colnames(design)
@@ -449,7 +438,6 @@ fit_cont <- limma::contrasts.fit(fit_raw, contrasts = contrasts)
 fit_ebayes <- limma::eBayes(fit_cont)
 ```
 
----
 
 ## ... 'information borrowing' does not affect 'fold-change'
 
@@ -477,7 +465,6 @@ with(
 )$coefficients %*% contrasts
 ```
 
----
 
 
 ## `limma` does other stuff ...
@@ -495,7 +482,6 @@ limma_fig_caption <- "Source: Richie et al. Nuc. Acids Res. (2015)"
 knitr::include_graphics(knitr::image_uri(limma_fig))
 ```
 
----
 
 ## Generalisations so far
 
@@ -509,7 +495,6 @@ Why should we assume / allow
 
 - equal weighting of all samples?
 
----
 
 ## Some Univariate Distibutions
 
@@ -527,7 +512,6 @@ figure_caption <- "Source: Ehsan Azhdari [CC BY-SA 3.0] via Wikipedia"
 knitr::include_graphics(knitr::image_uri(url))
 ```
 
----
 
 ## The 'why should the residuals be Normal?' generalisation: (`edgeR` / `DESeq2`)
 
@@ -545,7 +529,6 @@ eg, [generalised linear models](
   https://newonlinecourses.science.psu.edu/stat504/node/216/
 )
 
----
 
 ## RNA-Seq counts are _counts_
 
@@ -571,7 +554,6 @@ Negative-Binomial $\mathcal{NB} \left( r, q \right)$
     - r = size, q = prob of success
     - m = mean = $r(1-q)/q$ , v = variance = $r(1-q)/q^2$
 
----
 
 ## The `edgeR` model
 
@@ -596,7 +578,7 @@ where
 - `edgeR` call $\phi$ the dispersion parameter (note, $\phi = 0$ is a Poisson
 model; note $\phi ^ {1/2} = BCV$)
 
----
+##
 
 ```{r, echo = TRUE}
 dge_edger <- edgeR::estimateDisp(dge, design = design, tagwise = TRUE)
@@ -619,7 +601,7 @@ rbind(
 )
 ```
 
----
+##
 
 To get (approx) the same coefficients as `edgeR` using `glm`
 
@@ -646,14 +628,13 @@ nb <- glm(
 )
 ```
 
----
+##
 
 ```{r, echo = TRUE}
 nb$coefficients * log2(exp(1))
 (nb$coefficients * log2(exp(1))) %*% contrasts
 ```
 
----
 
 ## The 'why should all the effects be _fixed_?' generalisation: (`lme4`, `variancePartition`)
 
@@ -664,7 +645,7 @@ $$\mathbf{y} \sim {Fixed\ Effects} + Noise$$
 $$\downarrow$$
 $$\mathbf{y} \sim [Fixed Effects] + [Random Effects] + Noise$$
 
----
+##
 
 Sources of variability in the current experiment:
 
@@ -680,7 +661,6 @@ Fixed effect:
 
 - Unknown _constant_ we are trying to estimate
 
----
 
 ## Why are we estimating the baseline difference between cell types?
 
@@ -697,7 +677,6 @@ Random effect:
 
 - You estimate the properties of its distribution, not its _value_
 
----
 
 ## Mixed Model version
 
@@ -721,7 +700,6 @@ decorate_annotation("foo", grid.text("X beta +"))
 decorate_annotation("bar", grid.text("X gamma + Noise"))
 ```
 
----
 
 ## `voom::duplicateCorrelation`
 
@@ -739,7 +717,6 @@ treatment_contrast <- makeContrasts(
 blocks <- factor(dge_voom$targets$cell)
 ```
 
----
 
 ## `duplicateCorrelation (cont.)`
 
@@ -754,7 +731,6 @@ fit_cor <- lmFit(
 fit_cor$coefficients[row_carm1, ] %*% treatment_contrast
 ```
 
----
 
 ## `variancePartition`
 
@@ -771,7 +747,6 @@ vp <- variancePartition::dream(
 vp$coefficients
 ```
 
----
 
 ## Multiple random effects in `variancePartition::dream`
 
@@ -788,7 +763,6 @@ vp2 <- variancePartition::dream(
 vp2$coefficients
 ```
 
----
 
 ## The 'beyond the scope of the talk, and of my explanatory powers' generalisations ...
 
@@ -804,7 +778,6 @@ vp2$coefficients
 
 - the cell population milkshake ...
 
----
 
 ## Further Reading
 
@@ -826,7 +799,6 @@ Design matrix explorer:
 
 - [https://csoneson.github.io/ExploreModelMatrix/]()
 
----
 
 # Appendix
 
@@ -868,7 +840,6 @@ Model:
   There is _no_ one simplest model
 -->
 
----
 
 ## Was the model appropriate?
 
@@ -889,7 +860,6 @@ limma::plotMDS(
 
 [Could have included batch-effect and cell/treatment interaction]
 
----
 
 ## NB = Gamma-Poisson Mixture
 
@@ -931,7 +901,6 @@ int.hist(nb_samples, main = "Histogram of NB(r, p)")
 points(0.5 + 0:7, dnbinom(0:7, size = r, prob = 1 - p))
 ```
 
----
 
 ## `edgeR` fits larger coefficients for poorly-detected genes than `limma`
 
@@ -955,7 +924,6 @@ ggplot(
   lims(x = c(-5, 5), y = c(-5, 5))
 ```
 
----
 
 # Using `stan` to fit a negative binomial model for RNA-Seq
 
@@ -965,7 +933,6 @@ suppressPackageStartupMessages(
 )
 ```
 
----
 
 ## stan (cont.)
 
@@ -1001,7 +968,6 @@ model {
 "
 ```
 
----
 
 ## stan (cont.)
 
@@ -1023,7 +989,6 @@ write(model, file = here("models/negbin-glm.stan"))
 sm <- stan_model(here("models/negbin-glm.stan"))
 ```
 
----
 
 ## stan (cont.)
 
