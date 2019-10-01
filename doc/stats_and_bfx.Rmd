@@ -13,6 +13,7 @@ output:
 ```{r setup, include=FALSE}
 library(here)
 knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_knit$set(root.dir = here())
 
 height.5 = 4
 height.75 = 6
@@ -490,10 +491,10 @@ limma_fig <- here(
 limma_fig_caption <- "Source: Richie et al. Nuc. Acids Res. (2015)"
 ```
 
-
-```{r limma, echo = FALSE, fig.cap=limma_fig_caption, out.width = '75%'}
-knitr::include_graphics(limma_fig)
+```{r limma, echo = FALSE, fig.cap=limma_fig_caption, out.width = '75%'} 
+knitr::include_graphics(knitr::image_uri(limma_fig))
 ```
+
 ---
 
 ## Generalisations so far
@@ -523,7 +524,7 @@ figure_caption <- "Source: Ehsan Azhdari [CC BY-SA 3.0] via Wikipedia"
 ```
 
 ```{r distributions, echo=FALSE, fig.cap=figure_caption, out.width = '100%'}
-knitr::include_graphics(url)
+knitr::include_graphics(knitr::image_uri(url))
 ```
 
 ---
