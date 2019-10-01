@@ -5,10 +5,6 @@ author: "Russ Hyde"
 date: "30th September, 2019"
 output:
   ioslides_presentation
-#  xaringan::moon_reader:
-#    nature:
-#      highlightLines: true
-#      countdown: 120000
 ---
 
 ```{r setup, include=FALSE}
@@ -82,7 +78,7 @@ factor_model <- function(
   (but thankfully don't)
 
 
-## Preamble
+## Preamble {.smaller}
 
 Github:
 
@@ -110,7 +106,7 @@ for (pkg in pkgs) {
 ```
 
 
-## The Dataset
+## The Dataset {.smaller}
 
 [GSE103528](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE103528)
 
@@ -128,7 +124,7 @@ for (pkg in pkgs) {
         - he just `floor`ed the RSEM values)
 
 
-## The Dataset (cont.)
+## The Dataset (cont.) {.smaller}
 
 ```{r, echo = TRUE, message = FALSE}
 dge <- readRDS(here("data", "job", "GSE103528.dgelist.rds"))
@@ -162,7 +158,7 @@ dge %>%
 ]
 
 
-## A Simple Class of Models (shorthand)
+## A Simple Class of Models (shorthand) {.smaller}
 
 $$\mathbf{y} \sim \mathcal{N} \left(X\boldsymbol{\beta}, \sigma^2I \right)$$
 
@@ -181,7 +177,7 @@ resp)
 ... plus lots of assumptions
 
 
-## ... And In Practice
+## ... And In Practice {.smaller}
 
 $$\mathbf{y} \sim \mathcal{N} \left(X\boldsymbol{\beta}, \sigma^2I \right)$$
 
@@ -201,7 +197,7 @@ $\sigma$ - and how much noise is there around ...
 ... the fitted values
 
 
-## Design Matrices
+## Design Matrices {.smaller}
 
 .pull-left[
 Encode the experimental / statistical design:
@@ -233,7 +229,7 @@ See also: ExploreModelMatrix
 ]
 
 
-## Contrast Matrices
+## Contrast Matrices {.smaller}
 
 Encode the experimental comparisons
 
@@ -244,9 +240,12 @@ Columns: Comparison of interest
 Rows: Model coefficients (~ columns of design matrix)
 
 Treatment Y vs Treatment X:
-    - A) What combination of model coefficients gives the 'fitted value' for X
-    - B) ... for Y
-    - Subtract A from B
+
+- A) What combination of model coefficients gives the 'fitted value' for X
+
+- B) ... for Y
+
+- Subtract A from B
 
 Be careful with contrasts over 'interactions'
 - [genomicsclass.github.io/book/pages/interactions_and_contrasts.html]()
@@ -261,7 +260,7 @@ $$\downarrow$$
 $$\mathbf{Y} = f(\mathbf{y})$$
 $$\mathbf{Y} \sim \mathcal{N} \left(X\boldsymbol{\beta}, \sigma^2I \right)$$
 
-##
+## {.smaller}
 
 ```{r, echo = TRUE}
 design <- factor_model(~ cell + treatment, data = dge$samples)
@@ -291,7 +290,7 @@ p_carm1
 ```
 
 
-## `lm()` (cont.)
+## `lm()` (cont.) {.smaller}
 
 ```{r}
 lm_carm1 <- lm(intensity ~ cell + treatment, data = df_carm1)
@@ -313,10 +312,12 @@ with(
 ```
 
 
-##
+## {.smaller}
 
 But
+
 - `design` is a N x K matrix (here, binary)
+
 - `coefficients` is K x 1 vector (entries ~ columns of the design)
 
 What is the matrix * vector product?
@@ -408,7 +409,7 @@ $$\downarrow$$
 $$\sigma_{g} : {balance\ between\ gene-specific\ estimate\ and\ global\ estimate}$$
 $$\mathbf{y}_{[g]} \sim \mathcal{N} \left(X\boldsymbol{\beta}_{[g]}, \sigma^2_{[g]}I \right)$$
 
-##
+## {.smaller}
 
 ```{r, echo = TRUE, warning = FALSE}
 colnames(design)
@@ -439,7 +440,7 @@ fit_ebayes <- limma::eBayes(fit_cont)
 ```
 
 
-## ... 'information borrowing' does not affect 'fold-change'
+## ... 'information borrowing' does not affect 'fold-change' {.smaller}
 
 ... but voom-contrasts `!=` the `lm()` estimates
 
@@ -530,7 +531,7 @@ eg, [generalised linear models](
 )
 
 
-## RNA-Seq counts are _counts_
+## RNA-Seq counts are _counts_ {.smaller}
 
 Count distributions (examples)
 
@@ -555,7 +556,7 @@ Negative-Binomial $\mathcal{NB} \left( r, q \right)$
     - m = mean = $r(1-q)/q$ , v = variance = $r(1-q)/q^2$
 
 
-## The `edgeR` model
+## The `edgeR` model {.smaller}
 
 For a gene $g$ and sample $i$ (from experimental group $k$)
 
@@ -601,7 +602,7 @@ rbind(
 )
 ```
 
-##
+## {.smaller}
 
 To get (approx) the same coefficients as `edgeR` using `glm`
 
@@ -662,7 +663,7 @@ Fixed effect:
 - Unknown _constant_ we are trying to estimate
 
 
-## Why are we estimating the baseline difference between cell types?
+## Why are we estimating the baseline difference between cell types? {.smaller}
 
 ```{r, fig.height = height.5}
 design_heatmap(design) +
@@ -718,7 +719,7 @@ blocks <- factor(dge_voom$targets$cell)
 ```
 
 
-## `duplicateCorrelation (cont.)`
+## `duplicateCorrelation (cont.)` {.smaller}
 
 ```{r, echo = TRUE}
 dupcor <- limma::duplicateCorrelation(
@@ -732,7 +733,7 @@ fit_cor$coefficients[row_carm1, ] %*% treatment_contrast
 ```
 
 
-## `variancePartition`
+## `variancePartition` {.smaller}
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE, error = FALSE}
 vp <- variancePartition::dream(
@@ -748,7 +749,7 @@ vp$coefficients
 ```
 
 
-## Multiple random effects in `variancePartition::dream`
+## Multiple random effects in `variancePartition::dream` {.smaller}
 
 ```{r, echo = TRUE, message = FALSE}
 vp2 <- variancePartition::dream(
@@ -861,11 +862,14 @@ limma::plotMDS(
 [Could have included batch-effect and cell/treatment interaction]
 
 
-## NB = Gamma-Poisson Mixture
+## NB = Gamma-Poisson Mixture {.smaller}
 
 To sample 1000 NB(r, p) values
+
 - sample 1000 Gamma(shape = r, scale = p/(1-p)) values
+
 - then for each Gamma value, g, sample a Poisson(rate = g)
+
 - The latter are NB(r, p) // but R uses 1 - p rather than p
 
 ```{r}
@@ -925,7 +929,7 @@ ggplot(
 ```
 
 
-# Using `stan` to fit a negative binomial model for RNA-Seq
+## Using `stan` to fit a negative binomial model for RNA-Seq
 
 ```{r, echo = TRUE}
 suppressPackageStartupMessages(
@@ -990,7 +994,7 @@ sm <- stan_model(here("models/negbin-glm.stan"))
 ```
 
 
-## stan (cont.)
+## stan (cont.) {.smaller}
 
 ```{r, message = FALSE, warning = FALSE, echo = TRUE}
 # refresh = 0 prevents sampling output from printing
