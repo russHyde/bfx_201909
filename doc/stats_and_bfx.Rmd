@@ -12,6 +12,7 @@ library(here)
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_knit$set(root.dir = here())
 
+height.25 = 2
 height.5 = 4
 height.75 = 6
 height.max = 8
@@ -132,7 +133,7 @@ dge <- dge[dge$genes$gene_biotype == "protein_coding", ]
 dim(dge)
 ```
 
-```{r}
+```{r, echo = FALSE}
 # not shown: recode the dataset so that sh-Control is the reference group for
 # each cell line
 dge$samples$treatment <- factor(
@@ -140,9 +141,7 @@ dge$samples$treatment <- factor(
 )
 ```
 
-.pull-left[
-
-```{r density, eval = FALSE, echo = TRUE}
+```{r density, echo = FALSE}
 dge %>%
   edgeR::cpm(log = TRUE) %>%
   limma::plotDensities(
@@ -150,13 +149,6 @@ dge %>%
     main = "Density of log-CPM"
     )
 ```
-]
-
-.pull-right[
-```{r, density-out, ref.label = "density", echo = FALSE, fig.height = height.5}
-```
-]
-
 
 ## A Simple Class of Models (shorthand) {.smaller}
 
@@ -199,13 +191,14 @@ $\sigma$ - and how much noise is there around ...
 
 ## Design Matrices {.smaller}
 
-.pull-left[
 Encode the experimental / statistical design:
 
 - rows = samples
 - columns = model coefficients
 
-```{r, design-heatmap, eval = FALSE, echo = TRUE}
+Model: `intensity ~ cell + treatment`
+
+```{r, design-heatmap, echo = FALSE, fig.height = height.5}
 # `design_heatmap` plots binary matrices as heatmaps
 # `factor_model` wraps `model.matrix` - but doesn't prefix with the factor name
 design_heatmap(
@@ -221,13 +214,6 @@ design_heatmap(
 See also: ExploreModelMatrix
 
 - https://csoneson.github.io/ExploreModelMatrix/
-]
-
-.pull-right[
-```{r, design-heatmap-out, ref.label = "design-heatmap", echo = FALSE, fig.height = height.max}
-```
-]
-
 
 ## Contrast Matrices {.smaller}
 
@@ -383,7 +369,7 @@ hm2 <- design_heatmap(
 )
 ```
 
-```{r, fig.width = 10, fig.height = height.75}
+```{r, fig.width = 8, fig.height = height.5}
 draw(hm1 + ra + hm2, ht_gap = unit(3, "cm"))
 
 f <- function(i0) {
@@ -406,7 +392,8 @@ $$\mathbf{y}_{[g_1]} \sim \mathcal{N} \left(X\boldsymbol{\beta}_{[g_1]}, \sigma^
 $$\mathbf{y}_{[g_2]} \sim \mathcal{N} \left(X\boldsymbol{\beta}_{[g_2]}, \sigma^2_{[g_2]}I \right)$$
 $$\downarrow$$
 
-$$\sigma_{g} : {balance\ between\ gene-specific\ estimate\ and\ global\ estimate}$$
+$\sigma_{g}$ : balance between gene-specific estimate and global estimate}
+
 $$\mathbf{y}_{[g]} \sim \mathcal{N} \left(X\boldsymbol{\beta}_{[g]}, \sigma^2_{[g]}I \right)$$
 
 ## {.smaller}
@@ -454,7 +441,7 @@ rbind(
 )
 ```
 
---
+---
 
 "voom: Precision **weights** unlock linear model analysis tools for RNA-seq read counts." Law et al (Genome Biol. 2014)
 
@@ -539,7 +526,7 @@ Count distributions (examples)
 - {0, 1, 2, ..., n} Binomial
 - {0, 1, 2, ..., Inf} Poisson, Geometric
 
---
+---
 
 Negative-Binomial $\mathcal{NB} \left( r, q \right)$
 
@@ -663,9 +650,9 @@ Fixed effect:
 - Unknown _constant_ we are trying to estimate
 
 
-## Why are we estimating the baseline difference between cell types? {.smaller}
+## Why are we estimating the baseline difference between cell types? {.smaller .columns-2}
 
-```{r, fig.height = height.5}
+```{r, fig.height = height.5, fig.width = 4}
 design_heatmap(design) +
   rowAnnotation(
     df = dge$samples[, c("cell", "batch", "treatment")]
@@ -908,7 +895,7 @@ points(0.5 + 0:7, dnbinom(0:7, size = r, prob = 1 - p))
 
 ## `edgeR` fits larger coefficients for poorly-detected genes than `limma`
 
-```{r, fig.height = height.75}
+```{r, fig.height = height.5}
 data.frame(
   limma = fit_ebayes$coefficients[, "sh_55"],
   edger = (fit_edger$coefficients * log2(exp(1))) %*% contrasts[, "sh_55"],
