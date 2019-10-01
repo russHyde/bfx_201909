@@ -7,16 +7,29 @@ output:
   xaringan::moon_reader:
     nature:
       highlightLines: true
+      countdown: 120000
 ---
 
 ```{r setup, include=FALSE}
 library(here)
 knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_knit$set(root.dir = here())
 
 height.5 = 4
 height.75 = 6
 height.max = 8
 set.seed(3)
+```
+
+```{css, echo = FALSE}
+pre code, pre, code {
+  max-height: 480px;
+  white-space: pre !important;
+  overflow-x: scroll !important;
+  overflow-y: scroll !important;
+  word-break: keep-all !important;
+  word-wrap: initial !important;
+}
 ```
 
 ```{r}
@@ -55,6 +68,19 @@ factor_model <- function(
   mm
   }
 ```
+
+## Key Points
+
+- Common structure to well-known statistical tests
+
+- The linear model is pervasive
+
+- Multiple routes to generalisation of the linear model
+
+- We could use base R instead of limma / edgeR / DESeq2 / variancePartition
+  (but thankfully don't)
+
+---
 
 ## Preamble
 
@@ -453,6 +479,7 @@ with(
 
 ---
 
+
 ## `limma` does other stuff ...
 
 ```{r, echo = FALSE}
@@ -464,10 +491,24 @@ limma_fig <- here(
 limma_fig_caption <- "Source: Richie et al. Nuc. Acids Res. (2015)"
 ```
 
-
-```{r limma, echo = FALSE, fig.cap=limma_fig_caption, out.width = '75%'}
-knitr::include_graphics(limma_fig)
+```{r limma, echo = FALSE, fig.cap=limma_fig_caption, out.width = '75%'} 
+knitr::include_graphics(knitr::image_uri(limma_fig))
 ```
+
+---
+
+## Generalisations so far
+
+Why should we assume / allow
+
+- the residuals are normal?
+
+- only a single outcome vector?
+
+- that each hypothesis should be ran completely independently?
+
+- equal weighting of all samples?
+
 ---
 
 ## Some Univariate Distibutions
@@ -483,7 +524,7 @@ figure_caption <- "Source: Ehsan Azhdari [CC BY-SA 3.0] via Wikipedia"
 ```
 
 ```{r distributions, echo=FALSE, fig.cap=figure_caption, out.width = '100%'}
-knitr::include_graphics(url)
+knitr::include_graphics(knitr::image_uri(url))
 ```
 
 ---
