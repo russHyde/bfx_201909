@@ -1,3 +1,38 @@
+# Presentation on statistics and bioinformatics
+
+If you've cloned this project and want to run it:
+
+```
+# --- project environment is managed by conda
+
+# create build-matched environment within which to run the project
+conda create --name bfx_201909 --file envs/requirements.txt
+
+# OR
+# create a less stringently-matching environment,
+conda env create --name bfx_201909 --file envs/environment.yml
+
+# ensure the environment is active
+conda activate bfx_201909
+```
+
+```
+# --- filepaths and project-specific stuff are setup by a tool called sidekick that is within the repo
+./sidekick setup
+```
+
+```
+# --- running the project is managed by snakemake
+# 
+# this will download all relevant data files and any images used in the presentation
+# then compile the .Rmd file to a xaringan presentation
+snakemake -p
+```
+
+You can then view the presentation (`doc/stats_and_bfx.html`) in the browser
+
+---
+
 # Plan for presentation on statistics and bioinformatics
 
 ----
